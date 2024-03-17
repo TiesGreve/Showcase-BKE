@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApi.Data;
 
@@ -11,9 +12,11 @@ using WebApi.Data;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240317215623_game")]
+    partial class game
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,8 +170,8 @@ namespace WebApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FirstMoveId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("FirstMove")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("GameCreation")
                         .HasColumnType("datetime2");
@@ -180,24 +183,22 @@ namespace WebApi.Migrations
                     b.Property<int>("TurnCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("User1Id")
+                    b.Property<string>("User1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("User2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("User2Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("WinnerId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("Winner")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FirstMoveId");
-
-                    b.HasIndex("User1Id");
-
-                    b.HasIndex("User2Id");
-
-                    b.HasIndex("WinnerId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Games");
                 });
@@ -320,29 +321,16 @@ namespace WebApi.Migrations
 
             modelBuilder.Entity("WebApi.Models.Game", b =>
                 {
-                    b.HasOne("WebApi.Models.UserModel", "FirstMove")
-                        .WithMany()
-                        .HasForeignKey("FirstMoveId");
+                    b.HasOne("WebApi.Models.UserModel", "User")
+                        .WithMany("Games")
+                        .HasForeignKey("UserId");
 
-                    b.HasOne("WebApi.Models.UserModel", "User1")
-                        .WithMany()
-                        .HasForeignKey("User1Id");
+                    b.Navigation("User");
+                });
 
-                    b.HasOne("WebApi.Models.UserModel", "User2")
-                        .WithMany()
-                        .HasForeignKey("User2Id");
-
-                    b.HasOne("WebApi.Models.UserModel", "Winner")
-                        .WithMany()
-                        .HasForeignKey("WinnerId");
-
-                    b.Navigation("FirstMove");
-
-                    b.Navigation("User1");
-
-                    b.Navigation("User2");
-
-                    b.Navigation("Winner");
+            modelBuilder.Entity("WebApi.Models.UserModel", b =>
+                {
+                    b.Navigation("Games");
                 });
 #pragma warning restore 612, 618
         }
