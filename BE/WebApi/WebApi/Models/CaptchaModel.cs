@@ -5,4 +5,3 @@
         public string Recaptcha { get; set; }
     }
 }
-}

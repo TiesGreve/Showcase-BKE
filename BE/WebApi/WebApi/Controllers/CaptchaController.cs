@@ -29,6 +29,7 @@ namespace WebApi.Controllers
 
             var client = new HttpClient();
 
+            // IHttpClientFactory
 
             var result = await client.PostAsync($"https://www.google.com/recaptcha/api/siteverify?secret={_secretKey}&response={captcha.Recaptcha}", content);
             var responseBody = await result.Content.ReadAsStringAsync();
@@ -36,8 +37,10 @@ namespace WebApi.Controllers
             var recaptchaResult = JsonConvert.DeserializeObject<CaptchaResponse>(responseBody);
 
             if (!recaptchaResult.Success)
+            {
                 Log.Information("Fail captcha request");
                 return BadRequest("Invalid captcha");
+            }
             return Ok(responseBody);
         }
         public class CaptchaResponse
@@ -45,3 +48,4 @@ namespace WebApi.Controllers
             public bool Success { get; set; }
         }
     }
+}

@@ -9,21 +9,37 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
         <meta name="viewport" content="width=device-width,initial-scale=1.0">
         <script type="module" src="./components/startScreen/startScreen.js"></script>
+        <script type="module" src="./components/backButton/backButton.js"></script>
+        <script defer type="module" src="./js/register.js"></script>
+        <script src="https://www.google.com/recaptcha/api.js?render=6LfKon4pAAAAAMl9e47gJG3eOx7ePgZ_dJTmuOBF"></script>
     </Head>
     <body>
         <div class="page">
-            <h1 class="title">Registreren</h1>
-            <start-screen>
-                <form action="">
-                    <input type="text" id="UserName">
-                    <input type="text" id="Email">
-                    <input type="password" id="Password">
-                    <input type="password" id="PasswordCheck">
-                    <input type="submit" id="Submit">
-
-
-                </form>
-            </start-screen>
+            <div class="box">
+                <h1 class="title">Registreren</h1>
+                <start-screen>
+                    <back-button></back-button>
+                    <form action="" method="post">
+                        <div>
+                            <label for="UserName">Username*</label>
+                            <input type="text" id="UserName" required>
+                        </div>
+                        <div>
+                            <label for="Email">Email*</label>
+                            <input type="text" id="Email" required>
+                        </div>
+                        <div>
+                            <label for="Password">Password*</label>
+                            <input type="password" id="Password" required>
+                        </div>
+                        <div>
+                            <label for="PasswordCheck"> Repeat Password*</label>
+                            <input type="password" id="PasswordCheck" required>
+                        </div>
+                        <input type="submit" id="Submit" disabled = true value="Registreer">
+                    </form>
+                </start-screen>
+            </div>
         </div>
     </body>
 </html>

@@ -1,18 +1,18 @@
 const temp = document.createElement("template");
 temp.innerHTML = `
-<div class="startScreen"></div>
 `
-class StartScreen extends HTMLElement {
+export default class StartScreen extends HTMLElement {
     shadow;
 
     constructor(){
         super();
-        //this.shadow = this.attachShadow({mode: "open"});
+        //his.shadow = this.attachShadow({mode: "open"});
     }
     connectedCallback(){
         
         this.appendChild(temp.content.cloneNode(true));
         this.attachStyling();
+        
 
     }
     attachStyling(){
@@ -22,4 +22,4 @@ class StartScreen extends HTMLElement {
         this.appendChild(link);
     }
 }
-customElements.define('start-screen', StartScreen);
+customElements.define("start-screen", StartScreen)
