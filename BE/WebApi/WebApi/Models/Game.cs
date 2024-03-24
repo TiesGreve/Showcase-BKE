@@ -1,15 +1,37 @@
-﻿namespace WebApi.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WebApi.Models
 {
     public class Game
     {
-        public int Id { get; set; }
-        public UserModel User1 { get; set; }
-        public UserModel? User2 { get; set; }
-        public UserModel? Winner {  get; set; }
-        public UserModel? FirstMove { get; set; }
+        [Key]
+        public Guid Id { get; set; }
+        public Guid User1 { get; set; }
+        public Guid? User2 { get; set; }
+        public Guid? Winner {  get; set; }
+        public Guid? FirstMove { get; set; }
+        public Guid? CurrentTurn {  get; set; }
         public int TurnCount {  get; set; }
-        public string BoardState {  get; set; }
-        public string GameState {  get; set; }
+
+        public static int boardSize = 3;
+        public string[] BoardState {  get; set; }
+        public GameState GameState {  get; set; }
+        [Column(TypeName = "DateTime")]
         public DateTime GameCreation {  get; set; }
+        [Column(TypeName = "DateTime")]
+        public DateTime? GameStart {  get; set; }
+        [Column(TypeName = "DateTime")]
+        public DateTime? GameUpdate { get; set; }
+        [Column(TypeName = "DateTime")]
+        public DateTime? GameFinish { get; set; }
+    }
+    public enum GameState
+    {
+        Starting,
+        Player1Move,
+        Player2Move,
+        Draw,
+        Finnished
     }
 }

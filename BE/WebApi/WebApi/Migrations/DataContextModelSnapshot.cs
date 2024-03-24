@@ -17,15 +17,16 @@ namespace WebApi.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -49,7 +50,7 @@ namespace WebApi.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -63,9 +64,8 @@ namespace WebApi.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -74,7 +74,7 @@ namespace WebApi.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -88,9 +88,8 @@ namespace WebApi.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -99,7 +98,7 @@ namespace WebApi.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -110,9 +109,8 @@ namespace WebApi.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -121,13 +119,13 @@ namespace WebApi.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -136,10 +134,10 @@ namespace WebApi.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -157,55 +155,61 @@ namespace WebApi.Migrations
 
             modelBuilder.Entity("WebApi.Models.Game", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BoardState")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FirstMoveId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid?>("CurrentTurn")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("FirstMove")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("GameCreation")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("DateTime");
 
-                    b.Property<string>("GameState")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("GameFinish")
+                        .HasColumnType("DateTime");
+
+                    b.Property<DateTime?>("GameStart")
+                        .HasColumnType("DateTime");
+
+                    b.Property<int>("GameState")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("GameUpdate")
+                        .HasColumnType("DateTime");
 
                     b.Property<int>("TurnCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("User1Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("User1")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("User2Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid?>("User2")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("WinnerId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid?>("Winner")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FirstMoveId");
+                    b.HasIndex("User1");
 
-                    b.HasIndex("User1Id");
-
-                    b.HasIndex("User2Id");
-
-                    b.HasIndex("WinnerId");
+                    b.HasIndex("User2");
 
                     b.ToTable("Games");
                 });
 
             modelBuilder.Entity("WebApi.Models.UserModel", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -267,16 +271,16 @@ namespace WebApi.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("WebApi.Models.UserModel", null)
                         .WithMany()
@@ -285,7 +289,7 @@ namespace WebApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.HasOne("WebApi.Models.UserModel", null)
                         .WithMany()
@@ -294,9 +298,9 @@ namespace WebApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -309,7 +313,7 @@ namespace WebApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("WebApi.Models.UserModel", null)
                         .WithMany()
@@ -320,29 +324,23 @@ namespace WebApi.Migrations
 
             modelBuilder.Entity("WebApi.Models.Game", b =>
                 {
-                    b.HasOne("WebApi.Models.UserModel", "FirstMove")
-                        .WithMany()
-                        .HasForeignKey("FirstMoveId");
+                    b.HasOne("WebApi.Models.UserModel", null)
+                        .WithMany("Player1Games")
+                        .HasForeignKey("User1")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.HasOne("WebApi.Models.UserModel", "User1")
-                        .WithMany()
-                        .HasForeignKey("User1Id");
+                    b.HasOne("WebApi.Models.UserModel", null)
+                        .WithMany("Player2Games")
+                        .HasForeignKey("User2")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
 
-                    b.HasOne("WebApi.Models.UserModel", "User2")
-                        .WithMany()
-                        .HasForeignKey("User2Id");
+            modelBuilder.Entity("WebApi.Models.UserModel", b =>
+                {
+                    b.Navigation("Player1Games");
 
-                    b.HasOne("WebApi.Models.UserModel", "Winner")
-                        .WithMany()
-                        .HasForeignKey("WinnerId");
-
-                    b.Navigation("FirstMove");
-
-                    b.Navigation("User1");
-
-                    b.Navigation("User2");
-
-                    b.Navigation("Winner");
+                    b.Navigation("Player2Games");
                 });
 #pragma warning restore 612, 618
         }

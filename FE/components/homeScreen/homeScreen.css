@@ -7,11 +7,10 @@ home-screen {
 .home-button {
     height: 60px;
     width: 60%;
-    min-width: 120px;
+
     margin: 20px;
     background-color: #c3f4f6;
-    font-family: "Roboto";
-    font-size: 16px;
+
     color: white;
     border-radius: 15px;
     border: 0%;

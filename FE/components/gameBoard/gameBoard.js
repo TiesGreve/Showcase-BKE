@@ -1,6 +1,6 @@
 const temp = document.createElement("template");
 temp.innerHTML = `
-    <div class=""></div>
+    <div class="game-board"></div>
 `
 class GameBoard extends HTMLElement {
     shadow
