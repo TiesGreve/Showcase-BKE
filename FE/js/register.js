@@ -1,3 +1,5 @@
+import ApiHandeler from "./data";
+
 const form = document.querySelector("form");
 const userName = document.getElementById("UserName");
 const email = document.getElementById("Email");
@@ -58,57 +60,15 @@ form.addEventListener("submit", async (event) => {
             return;
         }
     })
-    grecaptcha.ready(function() {
-        grecaptcha.execute('6LfKon4pAAAAAMl9e47gJG3eOx7ePgZ_dJTmuOBF', {action: 'submit'}).then(async function(token) {
-            try {
-                console.log(token)
-                const response = await fetch('https://localhost:7059/api/Captcha', {
-                    method: "POST",
-                    body: JSON.stringify({
-                        Recaptcha: token
-                    }),
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                });
-                let result = await response.json();
-                console.log(result)
+    
+    if (ApiHandeler.GetCaptchaResult()) {
+        setTimeout(async () => {
+            await SendData();
+        }, 1000
+        );
+        window.location.href("home.html");
+    }
 
-                result = JSON.parse(result)
-                console.log(result)
-                console.log(response)
-
-                let humanFactor;
-                let isHuman;
-                if (result.score > 0.5) {
-                    humanFactor = 'Het lijkt erop dat je een mens bent, je score is: ' + result.score;
-                    isHuman = true;
-                }
-                else {
-                    humanFactor = 'Het lijkt erop dat je geen mens bent, je score is: ' + result.score;
-                    isHuman = false;
-                }
-
-                // Onderstaande code: pas aan naar je eigen smaak
-
-                if (isHuman) {
-                    // Wacht 3 seconden en verstuur dan het formulier alsnog
-                    setTimeout(async () => {
-                        await SendData();
-                    }, 1000
-                    );
-                    window.location.href("home.html");
-                }
-
-            }
-            catch (e) {
-                loading.classList.remove("lds-ellipsis");
-                error.textContent = 'Het bevestigen van de captcha is mislukt: ' + e.message;
-                error.classList.add("error");
-            }
-        })
-    })
 });
 
 async function SendData(){

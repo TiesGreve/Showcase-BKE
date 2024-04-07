@@ -1,5 +1,5 @@
 import StartScreen from "../startScreen/startScreen.js";
-const names = ["play", "login", "register"];
+const names = ["login", "register"];
 class HomeScreen extends HTMLElement{
     shadow
     constructor(){
@@ -15,7 +15,6 @@ class HomeScreen extends HTMLElement{
         names.forEach(element => {
             let button = document.getElementById(element);
             button.addEventListener("click", () =>{
-                console.log("hallo")
                 this.ChangePage(element);
             });
         })
@@ -37,6 +36,9 @@ class HomeScreen extends HTMLElement{
     }
     ChangePage(location){
         window.location.href = location + ".html";
+    }
+    ChangeLayout(){
+        document.createElement("")
     }
 }
 customElements.define("home-screen", HomeScreen);

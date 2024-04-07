@@ -37,6 +37,13 @@ class GameBoard extends HTMLElement {
         cell.setAttribute("class", "cell");
         cell.setAttribute("id", "c" + numb);
         cell.setAttribute("readonly", true);
+        cell.addEventListener("click", () => {
+        this.dispatchEvent( new CustomEvent("ButtonPressed", {
+            bubbles: true,
+            detail: {
+                number: numb
+            }}))
+        })
         return cell;
     }
 }

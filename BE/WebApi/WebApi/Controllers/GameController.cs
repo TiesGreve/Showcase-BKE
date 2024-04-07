@@ -1,8 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage;
+using Newtonsoft.Json.Linq;
+using Serilog;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using WebApi.Data;
 using WebApi.Models;
 
@@ -30,13 +36,14 @@ namespace WebApi.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> CreateGame([FromBody]string username)
+        public async Task<IActionResult> CreateGame()
         {
             try
             {
-                var name = _userManager.FindByNameAsync(username);
+                var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
+                var id = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+                var name = _userManager.FindByIdAsync(id);
                 var guid = name.Result.Id;
-
 
                 Game game = new Game()
                 {
@@ -63,12 +70,16 @@ namespace WebApi.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> JoinGame([FromBody] Guid guid, string username)
+        public async Task<IActionResult> JoinGame([FromBody] Guid guid)
         {
             try
             {
+                var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
+                var id = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+
+                var name = _userManager.FindByIdAsync(id);
                 var game = _dataContext.Games.Find(guid);
-                var name = _userManager.FindByNameAsync(username);
+
                 game.User2 = name.Result.Id;
                 game = SetGameStart(game);
                 await _dataContext.SaveChangesAsync();
@@ -85,16 +96,24 @@ namespace WebApi.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> MakeMove([FromBody] Game game)
+        public async Task<IActionResult> MakeMove([FromBody] int cell, Guid gameID)
         {
-            if(ModelState == null) return BadRequest(ModelState);
-            if(!ModelState.IsValid) return BadRequest(ModelState);
-            Game gameDB = _dataContext.Games.Find(game.Id);
-            gameDB.GameState = game.GameState;
+            if (ModelState == null) return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            Game gameDB = _dataContext.Games.Find(gameID);
+
+            if(gameDB.User2 == null) return BadRequest("No second user in game");
+            if (gameDB.BoardState[cell] != null) return BadRequest("Cell already filled in");
+
+            if (gameDB.CurrentTurn == gameDB.User1) gameDB.BoardState[cell] = "x";
+            else gameDB.BoardState[cell] = "o";
+
             gameDB = CheckGame(gameDB);
-            if(gameDB.GameFinish == null)
+
+            if (gameDB.GameFinish == null)
             {
-                if(gameDB.CurrentTurn == gameDB.User1)
+                if (gameDB.CurrentTurn == gameDB.User1)
                 {
                     gameDB.CurrentTurn = gameDB.User2;
                     gameDB.GameState = GameState.Player2Move;
@@ -102,7 +121,7 @@ namespace WebApi.Controllers
                 else
                 {
                     gameDB.CurrentTurn = gameDB.User1;
-                    gameDB.GameState= GameState.Player1Move;
+                    gameDB.GameState = GameState.Player1Move;
                 }
             }
             gameDB.GameUpdate = DateTime.Now;
@@ -111,11 +130,11 @@ namespace WebApi.Controllers
         }
 
         [Authorize]
-        [HttpPost("Check")]
+        [HttpGet("id")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> CheckBoard([FromBody] Guid guid)
+        public async Task<IActionResult> CheckBoard(Guid guid)
         {
             return Ok(_dataContext.Games.Find(guid));
         }
