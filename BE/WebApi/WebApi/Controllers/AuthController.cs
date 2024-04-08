@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -28,6 +29,7 @@ namespace WebApi.Controllers
             _configuration = configuration;
             _dataContext = dataContext;
         }
+
         [HttpPost("login")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -36,12 +38,15 @@ namespace WebApi.Controllers
         {
             if(ModelState.IsValid)
             {
+                Log.Information("Model Valid");
                 var user = await _userManager.FindByEmailAsync(loginModel.Email);
+                Log.Information("User Found");
+                if (user == null) return NotFound();
                 var result = await _signInManager.PasswordSignInAsync(user.UserName, loginModel.Password!, true, false);
-                var roleID = _dataContext.UserRoles.Where(r => r.UserId == user.Id).Select(r => r.RoleId);
-                var role = _dataContext.Roles.Where(r => r.Id.Equals(roleID)).Select(r => r.Name);
                 if (result.Succeeded)
                 {
+                    Log.Information("Password Correct ");
+                    
                     var authClaims = new List<Claim>
                     {
                        new Claim(ClaimTypes.Name, user.UserName),
@@ -52,14 +57,22 @@ namespace WebApi.Controllers
                        new Claim(JwtRegisteredClaimNames.Aud, _configuration["Jwt:Audience"]),
                        new Claim(JwtRegisteredClaimNames.Iss, _configuration["Jwt:Issuer"])
                     };
-                    if(role != null )
+                    var roleIDs = _dataContext.UserRoles.Where(r => r.UserId == user.Id).Select(r => r.RoleId).ToList();
+                    
+                    if (roleIDs.Count > 0)
                     {
+                        var role = _dataContext.Roles.Where(r => r.Id.Equals(roleIDs.First())).Select(r => r.Name);
                         authClaims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+                    }
+                    else
+                    {
+                        authClaims.Add(new Claim(ClaimTypes.Role, "Gebruiker"));
                     }
 
                     var token = GetToken(authClaims);
                     return Ok(new JwtSecurityTokenHandler().WriteToken(token));
                 }
+
                 ModelState.AddModelError("Error", "Invalid login attempt");
                 ModelState.AddModelError("Error", result.ToString());
             }
@@ -76,6 +89,8 @@ namespace WebApi.Controllers
         {
             if(ModelState == null) return BadRequest(ModelState);
             if(!ModelState.IsValid) return BadRequest(ModelState);
+            var result = await _userManager.FindByEmailAsync(registerModel.Email);
+            if (result != null) return BadRequest(registerModel.Email + " is al in gebruik");
             return await RegisterUser(registerModel);
             
         }
@@ -87,7 +102,8 @@ namespace WebApi.Controllers
                 UserModel user = new()
                 {
                     UserName = registerModel.UserName,
-                    Email = registerModel.Email
+                    Email = registerModel.Email,
+                    EmailConfirmed = true
                 };
                 
                 var result = await _userManager.CreateAsync(user, registerModel.Password);
@@ -126,11 +142,28 @@ namespace WebApi.Controllers
         }
         [HttpGet("Name")]
         [Authorize]
-        public async Task<IActionResult> GetName()
+        public async Task<IActionResult> GetOwnName()
         {
             var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
             var name = token.Claims.First(claim => claim.Type == ClaimTypes.Name);
             return Ok(name);
+        }
+        [HttpGet("Name/{playerID}")]
+        [Authorize]
+        public async Task<IActionResult> GetName(string playerID)
+        {
+            var user = await _userManager.FindByIdAsync(playerID);
+            if (user != null) return Ok(user.UserName);
+            else return NotFound();
+        }
+        [HttpGet("Role")]
+        [Authorize]
+        public async Task<IActionResult> GetRole()
+        {
+            var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
+            var role = token.Claims.First(claim => claim.Type == ClaimTypes.Role);
+            foreach(var claim in token.Claims) Log.Information(claim.Type + " -- "  + claim.Value);
+            return Ok(role);
         }
         private JwtSecurityToken GetToken(IEnumerable<Claim> authClaims)
         {

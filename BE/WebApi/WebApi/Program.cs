@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using WebApi;
 using WebApi.Data;
 using WebApi.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
@@ -26,13 +27,14 @@ builder.Services.AddCors(options => {
                             .WithOrigins("http://localhost:5500") // specifying the allowed origin
                             .WithOrigins("http://127.0.0.1:5500") // specifying the allowed origin
                             .WithOrigins("https://showcaseclient.pages.dev")
+                            .WithOrigins("*")
                             .WithMethods("POST") // defining the allowed HTTP method
                             .WithMethods("GET")
                             .AllowAnyHeader(); // allowing any header to be sent
                       });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -104,6 +106,8 @@ builder.Services.AddIdentityApiEndpoints<UserModel>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
 })
+    .AddRoles<IdentityRole<Guid>>()
+    .AddRoleManager<RoleManager<IdentityRole<Guid>>>()
     .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<DataContext>();
 
@@ -125,6 +129,12 @@ app.UseAuthorization();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.MapControllers();
+using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
+    ApplicationDBInitializer.SeedUsers(userManager);
+}
+
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()

@@ -8,121 +8,205 @@
 export default class ApiHandeler {
     static connectionString = "https://localhost:7059";
     constructor(){
-
+        
     }
+    
+
+    static async LoginUser(email, password){
+        try{
+            let response = await fetch(this.connectionString + "/api/Auth/login", {
+                method: "POST",
+                headers: {
+                    'accept' : 'application/json',
+                    'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({
+                    Email: email,
+                    Password: password
+                })
+            })
+            let result = await response.json();
+            if (response.ok){
+                sessionStorage.setItem("token", result)
+            }
+            return response.ok
+        }
+        catch(e){
+
+        }
+    }
+
+    static async RegisterUser(email, username, password, passwordRe){
+        try{
+            let response = await fetch(this.connectionString + "/api/Auth/register", {
+                method: "POST",
+                headers: {
+                    'Accept' : 'application/json',
+                    'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({
+                    Email: email,
+                    UserName: username,
+                    Password: password,
+                    PasswordCheck: passwordRe
+                })
+            })
+            return response;
+        }
+        catch(e){
+    
+        }
+    }
+
     static async GetUserId(){
         try{
-            const token = localStorage.getItem('token');
-            const response = fetch(connectionString + "/api/Auth/Id", {
+            const token = sessionStorage.getItem('token');
+            const response = await fetch(this.connectionString + "/api/Auth/Id", {
                 method: "GET",
                 headers: {
                     'Accept' : 'application/json',
                     'Content-Type' : 'application/json',
-                    'Authorization': token
+                    'Authorization': 'Bearer ' + token
                 }
             })
+            if(response.status === 401) throw new Error(response.status);
             let result = await response.json();
-            return result.parse();
+            return result;
         }
         catch(ex){
+            this.Unauthorized()
             return new Error(ex)
         }
     }
-    static async GetUserName(){
+    static async GetOwnUsername(){
         try{
-            const token = localStorage.getItem('token');
-            const response = fetch(connectionString + "/api/Auth/Name", {
+            const token = sessionStorage.getItem('token');
+            const response = await fetch(this.connectionString + "/api/Auth/Name", {
                 method: "GET",
                 headers: {
                     'Accept' : 'application/json',
                     'Content-Type' : 'application/json',
-                    'Authorization': token
+                    'Authorization': 'Bearer ' + token
                 }
             })
-            let result = (await response).json();
-            return result.parse();
+            if(response.status === 401) throw new Error(response.status);
+            let result = await response.json();
+            return result;
         }
         catch(ex){
+            this.Unauthorized()
+            return new Error(ex)
+        }
+    }
+    static async GetUsername(id){
+        try{
+            const token = sessionStorage.getItem('token');
+            const response = await fetch(this.connectionString + "/api/Auth/Name/" + id, {
+                method: "GET",
+                headers: {
+                    'Accept' : 'application/json',
+                    'Content-Type' : 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            if(response.status === 401) throw new Error(response.status);
+            let result = await response.json();
+            return result;
+        }
+        catch(ex){
+            this.Unauthorized()
             return new Error(ex)
         }
     }
     static async CreateGame(){
         try{
-            const token = localStorage.getItem('token');
-            const response = fetch(connectionString + "/api/Game/Create", {
+            const token = sessionStorage.getItem('token');
+            const response = await fetch(this.connectionString + "/api/Game/Create", {
                 method: "POST",
                 headers: {
                     'Accept' : 'application/json',
                     'Content-Type' : 'application/json',
-                    'Authorization': token
+                    'Authorization': 'Bearer ' + token
                 }
-            });
+            })
+            if(response.status === 401) throw new Error(response.status);
             let result = await response.json();
-            return result.parse();
+            return result;
         }
         catch(ex){
+            this.Unauthorized()
             return new Error(ex)
         }
 
     }
     static async JoinGame(guid){
         try{
-            const token = localStorage.getItem('token');
-            const response = fetch(connectionString + "/api/Game/Join",{
+            const token = sessionStorage.getItem('token');
+            const response = await fetch(this.connectionString + "/api/Game/Join",{
                 method: "POST",
-                body: JSON.stringify({
-                    Guid: guid
-                }),
                 headers: {
                     'Accept' : 'application/json',
                     'Content-Type' : 'application/json',
-                    'Authorization': token
-                }
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({
+                    GameId : guid
+                })
             })
+            if(response.status === 401) throw new Error(response.status);
             let result = await response.json()
-            return result.parse();
+            return result;
         }
         catch(ex){
+            this.Unauthorized();
             return new Error(ex);
         }
     }
 
     static async MakeMove(cell){
         try{
-            const token = localStorage.getItem('token');
-            let gameID = localStorage.getItem("GameId");
-            let response = fetch(connectionString + '/api/Game/Move',{
+            const token = sessionStorage.getItem('token');
+            let game = JSON.parse(sessionStorage.getItem("Game"));
+            let response = await fetch(this.connectionString + '/api/Game/Move',{
                 method: "POST",
                 body: JSON.stringify({
                     Cell : cell,
-                    GameID : gameID
+                    GameID : game.id
                 }),
                 headers: {
                     'Accept' : 'application/json',
                     'Content-Type' : 'application/json',
-                    'Authorization': token
+                    'Authorization': 'Bearer ' + token
                 }
             })
-            let result = await response.json()
+            if(response.status === 401) throw new Error(response.status);
+            let result = await response.text();
+            return result;
         }
-        catch(e){
-
+        catch(ex){
+            this.Unauthorized()
+            return new Error(ex)
         }
     }
     static async CheckGame(){
         try{
-            const token = localStorage.getItem('token');
-            const response = await fetch(connectionString + '/api/Game/id?guid='+localStorage.getItem("GameId", {
+            const token = sessionStorage.getItem('token');
+            let game = JSON.parse(sessionStorage.getItem("Game"));
+            const response = await fetch(this.connectionString + '/api/Game/'+ game.id , {
                 method: "GET",
                 headers:  {
                     'Accept' : 'application/json',
                     'Content-Type' : 'application/json',
-                    'Authorization': token
+                    'Authorization': 'Bearer ' + token
                 }
-            }))
+            })
+            if(response.status === 401 ) throw new Error(response.status);
+            let result = await response.json();
+            return result;
         }
-        catch(e){
-
+        catch(ex){
+            this.Unauthorized()
+            return new Error(ex)
         }
     }
 
@@ -130,7 +214,7 @@ export default class ApiHandeler {
         grecaptcha.ready(function() {
             grecaptcha.execute('6LfKon4pAAAAAMl9e47gJG3eOx7ePgZ_dJTmuOBF', {action: 'submit'}).then(async function(token) {
                 try {
-                    const response = await fetch(connectionString + '/api/Captcha', {
+                    const response = await fetch(this.connectionString + '/api/Captcha', {
                         method: "POST",
                         body: JSON.stringify({
                             Recaptcha: token
@@ -141,11 +225,7 @@ export default class ApiHandeler {
                         }
                     });
                     let result = await response.json();
-                    console.log(result)
-    
                     result = JSON.parse(result)
-                    console.log(result)
-                    console.log(response)
                     if(result == undefined){
                         throw Error("result undefined");
                     }
@@ -161,5 +241,30 @@ export default class ApiHandeler {
                 }
             })
         })
+    }
+    static async GetRole(){
+        try{
+            const token = sessionStorage.getItem('token');
+            let game = JSON.parse(sessionStorage.getItem("Game"));
+            const response = await fetch(this.connectionString + '/api/Auth/Role' , {
+                method: "GET",
+                headers:  {
+                    'Accept' : 'application/json',
+                    'Content-Type' : 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            if(response.status === 401 ) throw new Error(response.status);
+            let result = await response.json();
+            return result;
+        }
+        catch(ex){
+            this.Unauthorized()
+            return new Error(ex)
+        }
+    }
+    static Unauthorized(){
+        sessionStorage.removeItem("token");
+        window.location.href = "index.html"
     }
 }

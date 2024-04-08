@@ -70,24 +70,38 @@ namespace WebApi.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> JoinGame([FromBody] Guid guid)
+        public async Task<IActionResult> JoinGame([FromBody] JoinGameModel joinGame)
         {
             try
             {
                 var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
-                var id = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+                var userId = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
 
-                var name = _userManager.FindByIdAsync(id);
-                var game = _dataContext.Games.Find(guid);
+                // Retrieve user name asynchronously
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return BadRequest("User not found.");
+                }
 
-                game.User2 = name.Result.Id;
+                // Find the game by GameId
+                var game = await _dataContext.Games.FindAsync(joinGame.GameID);
+                if (game == null)
+                {
+                    return BadRequest("Game not found.");
+                }
+
+                // Update game and save changes
+                game.User2 = user.Id;
                 game = SetGameStart(game);
                 await _dataContext.SaveChangesAsync();
+
                 return Ok(game);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                Log.Error(ex.ToString());
+                return BadRequest("An error occurred while joining the game.");
             }
         }
 
@@ -96,18 +110,18 @@ namespace WebApi.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> MakeMove([FromBody] int cell, Guid gameID)
+        public async Task<IActionResult> MakeMove([FromBody] PlayingModel playing)
         {
             if (ModelState == null) return BadRequest(ModelState);
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            Game gameDB = _dataContext.Games.Find(gameID);
+            Game gameDB = _dataContext.Games.Find(playing.GameID);
 
             if(gameDB.User2 == null) return BadRequest("No second user in game");
-            if (gameDB.BoardState[cell] != null) return BadRequest("Cell already filled in");
+            if (gameDB.BoardState[playing.Cell] != null) return BadRequest("Cell already filled in");
 
-            if (gameDB.CurrentTurn == gameDB.User1) gameDB.BoardState[cell] = "x";
-            else gameDB.BoardState[cell] = "o";
+            if (gameDB.CurrentTurn == gameDB.User1) gameDB.BoardState[playing.Cell] = "x";
+            else gameDB.BoardState[playing.Cell] = "o";
 
             gameDB = CheckGame(gameDB);
 
@@ -130,13 +144,15 @@ namespace WebApi.Controllers
         }
 
         [Authorize]
-        [HttpGet("id")]
+        [HttpGet("{guid}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> CheckBoard(Guid guid)
         {
-            return Ok(_dataContext.Games.Find(guid));
+            var result = await _dataContext.Games.FindAsync(guid);
+            if(result == null) return NotFound();
+            return Ok(result);
         }
         private Game SetGameStart (Game game)
         {
@@ -145,11 +161,13 @@ namespace WebApi.Controllers
             {
                 game.FirstMove = game.User1;
                 game.GameState = GameState.Player1Move;
+                game.CurrentTurn = game.User1;
             }
             else
             {
                 game.FirstMove = game.User2;
                 game.GameState = GameState.Player2Move;
+                game.CurrentTurn = game.User2;
             }
             game.GameStart = DateTime.Now;
             return game;

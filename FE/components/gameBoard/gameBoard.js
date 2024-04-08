@@ -33,7 +33,7 @@ class GameBoard extends HTMLElement {
     }
     createCell(numb){
         let cell = document.createElement("input");
-        cell.setAttribute("type", "text")
+        cell.setAttribute("type", "button")
         cell.setAttribute("class", "cell");
         cell.setAttribute("id", "c" + numb);
         cell.setAttribute("readonly", true);

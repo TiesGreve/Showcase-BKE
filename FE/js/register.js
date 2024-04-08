@@ -1,4 +1,4 @@
-import ApiHandeler from "./data";
+import ApiHandeler from "./data.js";
 
 const form = document.querySelector("form");
 const userName = document.getElementById("UserName");
@@ -63,37 +63,17 @@ form.addEventListener("submit", async (event) => {
     
     if (ApiHandeler.GetCaptchaResult()) {
         setTimeout(async () => {
-            await SendData();
+            let response = await ApiHandeler.RegisterUser(email.value, userName.value, password.value, passwordRe.value);
+            if(response.status === 200){
+                window.location.href = "home.html";
+            }
         }, 1000
         );
-        window.location.href("home.html");
+        
     }
 
 });
 
 async function SendData(){
-    try{
-        let response = await fetch("https://localhost:7059/api/Auth/register", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify({
-                Email: email.value,
-                UserName: userName.value,
-                Password: password.value,
-                PasswordCheck: passwordRe.value
-            })
-        }).then(res => {
-            if(!res.ok){
-                
-            }
-            else{
 
-            }
-        })
-    }
-    catch(e){
-
-    }
 }

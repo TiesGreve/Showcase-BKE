@@ -1,4 +1,20 @@
 import StartScreen from "../startScreen/startScreen.js";
+import ApiHandeler from "../../js/data.js";
+
+const temp = document.createElement("template");
+temp.innerHTML = `                    
+<form action="" method="post">
+    <div>
+        <label for="Email">Email</label>
+        <input type="text" id="Email" required>
+    </div>
+    <div>
+        <label for="Password">Password</label>
+        <input type="password" id="Password" required>
+    </div>
+    <input class="home-button" type="submit" id="login-submit" disabled = true value="Login">
+</form>`
+
 const names = ["login", "register"];
 class HomeScreen extends HTMLElement{
     shadow
@@ -12,13 +28,8 @@ class HomeScreen extends HTMLElement{
             this.setupButton(element, startScreen);
         });
         this.appendChild(startScreen.cloneNode(true))
-        names.forEach(element => {
-            let button = document.getElementById(element);
-            button.addEventListener("click", () =>{
-                this.ChangePage(element);
-            });
-        })
-        this.attachStyling()
+        this.attachEventListeners();
+        this.attachStyling();
     }
     attachStyling(){
         const link = document.createElement("link");
@@ -32,6 +43,45 @@ class HomeScreen extends HTMLElement{
         button.setAttribute("id", name);
         button.setAttribute("class", "home-button");
         startScreen.appendChild(button);
+
+    }
+    attachEventListeners(){
+        let register = document.getElementById("register");
+        let login = document.getElementById("login");
+        register.addEventListener("click", () =>{
+            this.ChangePage("register");
+        });
+        login.addEventListener("click", (e) => {
+            this.innerHTML = "";
+            let startScreen = document.createElement("start-screen");
+            startScreen.appendChild(temp.content.cloneNode(true))
+            this.appendChild(startScreen.cloneNode(true))
+            this.setLoginListeners();
+            this.attachStyling();
+        })
+        
+    }
+    setLoginListeners(){
+        let email = document.getElementById("Email");
+        let password = document.getElementById("Password");
+        let login = document.getElementById("login-submit");
+        console.log(email + password + login)
+        email.addEventListener("change", () => {
+            if(email.value != "" && password.value != "")login.removeAttribute("disabled")
+            else login.setAttribute("disabled", true);
+        })
+        password.addEventListener("change", (e) => {
+            if(email.value != "" && password.value != "")login.removeAttribute("disabled")
+            else login.setAttribute("disabled", true);
+        })
+        login.addEventListener("click", async (e) =>  {
+            e.preventDefault();
+            let result = await ApiHandeler.LoginUser(email.value, password.value);
+            if(result){
+                window.location.href = "home.html"
+            }
+
+        })
 
     }
     ChangePage(location){

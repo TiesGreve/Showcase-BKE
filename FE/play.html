@@ -7,21 +7,47 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
     <script type="module" src="components/gameBoard/gameBoard.js"></script>
     <script type="module" src="components/startScreen/startScreen.js"></script>
-    <title>Document</title>
+    <script defer type="module" src="js/game.js"></script>
+    <title>TicTacToe</title>
 </head>
 <body>
     <div class="page">
-        <game-board>
-        </game-board>
-        <start-screen>
-            <section>
+        <section class="game">
+            <game-board>
+            </game-board>
+            <section class="game-info">
+                <start-screen>
+                    <section class="game-info__section">
+                        <div class="game-info_column" id="player1">
+                            <h3 id="player1-name">name...</h3>
+                        </div>
+                        <div class="game-info__column" id="game">
+                            <h3 id="game-id">gameid...</h3>
+                            <button id="game-id-copy">copy id</button>
+                            <div class="game-id__currentTurn">
+                                <h4>Current Turn:</h4>
+                                <h4 id=""></h4>
+                            </div>
+                        </div>
+                        <div class="game-info_column" id="player1">
+                            <h3 id="player2-name">name...</h3>
+                        </div>
+                    </section>
+                </start-screen>
+            </section>
+        </section>
+        <div id="unblurred">
+            <section class="game-popup">
+                <button class="home-button" id="CreateGame">Create Game</button>
+                <hr>
                 <form action="">
+                    <h2 class="title">Join Game</h2>
                     <label for="GameID">GameID</label>
                     <input type="text" id="GameID"/>
-                    <input type="submit" id="JoinGame">
+                    <input disabled type="submit" id="JoinGame">
                 </form>
             </section>
-        </start-screen>
+        </div>
     </div>
 </body>
 </html>

@@ -42,6 +42,14 @@ namespace WebApi.Data
                 .HasForeignKey(g => g.User2)
                 .OnDelete(DeleteBehavior.Restrict);
             });
+            builder.Entity<IdentityRole<Guid>>().HasData(new IdentityRole<Guid>
+            {
+                Id = Guid.NewGuid(),
+                Name = "Admin",
+                NormalizedName = "ADMIN",
+                ConcurrencyStamp = DateTime.UtcNow.ToString()
+            });
+            
         }
     }
 }
