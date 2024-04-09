@@ -12,7 +12,7 @@ temp.innerHTML = `
         <label for="Password">Password</label>
         <input type="password" id="Password" required>
     </div>
-    <input class="home-button" type="submit" id="login-submit" disabled = true value="Login">
+    <input class="home-button" type="submit" id="login-submit" value="Login">
 </form>`
 
 const names = ["login", "register"];
@@ -39,7 +39,8 @@ class HomeScreen extends HTMLElement{
     }
     setupButton(name, startScreen){
         let button = document.createElement("button");
-        button.innerText = name;
+        if(name == "register") button.innerText = "registreren"
+        else button.innerText = name;
         button.setAttribute("id", name);
         button.setAttribute("class", "home-button");
         startScreen.appendChild(button);
@@ -68,11 +69,11 @@ class HomeScreen extends HTMLElement{
         console.log(email + password + login)
         email.addEventListener("change", () => {
             if(email.value != "" && password.value != "")login.removeAttribute("disabled")
-            else login.setAttribute("disabled", true);
+            //else login.setAttribute("disabled", true);
         })
         password.addEventListener("change", (e) => {
             if(email.value != "" && password.value != "")login.removeAttribute("disabled")
-            else login.setAttribute("disabled", true);
+            //else login.setAttribute("disabled", true);
         })
         login.addEventListener("click", async (e) =>  {
             e.preventDefault();
