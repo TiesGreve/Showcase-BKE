@@ -26,8 +26,7 @@ builder.Services.AddCors(options => {
                           builder
                             .WithOrigins("http://localhost:5500") // specifying the allowed origin
                             .WithOrigins("http://127.0.0.1:5500") // specifying the allowed origin
-                            .WithOrigins("https://showcaseclient.pages.dev")
-                            .WithOrigins("*")
+                            .WithOrigins("https://showcase-bke.pages.dev")
                             .WithMethods("POST") // defining the allowed HTTP method
                             .WithMethods("GET")
                             .AllowAnyHeader(); // allowing any header to be sent

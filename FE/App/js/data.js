@@ -263,6 +263,51 @@ export default class ApiHandeler {
             return new Error(ex)
         }
     }
+
+    static async GetUsers(){
+        try{
+            const token = sessionStorage.getItem('token');
+                const response = await fetch(this.connectionString + "/api/Admin/", {
+                method: "GET",
+                headers:  {
+                    'Accept' : 'application/json',
+                    'Content-Type' : 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            if(response.status === 401 ) throw new Error(response.status);
+            let result = await response.json();
+            return result;
+        }
+        catch(ex){
+            this.Unauthorized()
+            return new Error(ex)
+        }
+    }
+    static async UpdateUserLockout(guid, lockout){
+        try{
+            const token = sessionStorage.getItem('token');
+            const response = await fetch(this.connectionString + "/api/Admin/" + guid, {
+                method: "GET",
+                headers:  {
+                    'Accept' : 'application/json',
+                    'Content-Type' : 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({
+
+                })
+            })
+            if(response.status === 401 ) throw new Error(response.status);
+            let result = await response.json();
+            return result;
+        }
+        catch(ex){
+            this.Unauthorized()
+            return new Error(ex)
+        }
+    }
+
     static Unauthorized(){
         sessionStorage.removeItem("token");
         window.location.href = "index.html"

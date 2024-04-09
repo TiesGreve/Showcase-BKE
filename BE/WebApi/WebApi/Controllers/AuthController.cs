@@ -61,8 +61,8 @@ namespace WebApi.Controllers
                     
                     if (roleIDs.Count > 0)
                     {
-                        var role = _dataContext.Roles.Where(r => r.Id.Equals(roleIDs.First())).Select(r => r.Name);
-                        authClaims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+                        var role = await _userManager.GetRolesAsync(user);
+                        authClaims.Add(new Claim(ClaimTypes.Role, role[0]));
                     }
                     else
                     {

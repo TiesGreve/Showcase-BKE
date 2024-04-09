@@ -124,6 +124,10 @@ label {
 h3{
     font-family: "Roboto";
 }
+h4{
+    font-family: "Roboto";
+    text-align: center;
+}
 
 input {
     background-color: white;
@@ -145,4 +149,38 @@ input[type=submit]{
 input[type=submit]:disabled{
     background-color: #9a9a9a;
     color: #cfcccc;
+}
+
+table {
+    background-color: #70b3b8;
+    border-radius: 20px;
+    padding: 20px;
+    border-collapse: collapse;
+    
+}
+.row {
+    border-top: solid gray;
+    border-width: 1px 1px;
+}
+
+td {
+    min-width: 150px;
+    text-align: center;
+    border-right: solid gray;
+    border-left: solid gray;
+    border-width: 1px;
+}
+td:first-child{
+    border-left: none;
+}
+td:last-child{
+    border-right: none;
+}
+
+p{
+    font-family: "Roboto";
+}
+th {
+    
+    font-family: "Robot";
 }

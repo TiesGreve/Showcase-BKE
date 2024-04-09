@@ -17,7 +17,8 @@ tempAdmin.innerHTML = `
                 <th>ID</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>block</th>
+                <th>Is locked out</th>
+                <th>toggle lockout</th>
             </tr>
         </thead>
         <tbody>
@@ -40,4 +41,37 @@ if(role.value == "Gebruiker"){
 else{
     let screen = document.querySelector("start-screen");
     screen.appendChild(tempAdmin.content.cloneNode(true));
+    FillTable();
+}
+
+async function FillTable(){
+    let users = await ApiHandeler.GetUsers();
+    console.log(users)
+    users.forEach(element => {
+        let row = document.createElement("tr");
+        row.setAttribute("class", "row")
+        let id = document.createElement("td");
+        id.appendChild(CreateText(element.id))
+        row.appendChild(id);
+        let Name = document.createElement("td");
+        Name.appendChild(CreateText(element.userName))
+        row.appendChild(Name);
+        let Email = document.createElement("td");
+        Email.appendChild(CreateText(element.email))
+        row.appendChild(Email);
+        let IsLockout = document.createElement("td");
+        IsLockout.appendChild(CreateText(!!element.LockoutButton))
+        row.appendChild(IsLockout);
+        let LockoutButton = document.createElement("td");
+        row.appendChild(LockoutButton);
+        
+        document.querySelector("tbody").appendChild(row);
+        
+    });
+}
+
+function CreateText(string){
+    let p = document.createElement("p");
+    p.innerText = string;
+    return p;
 }
