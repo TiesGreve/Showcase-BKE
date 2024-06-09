@@ -79,22 +79,18 @@ namespace WebApi.Controllers
             {
                 var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
                 var userId = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
-
-                // Retrieve user name asynchronously
+                
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
                 {
                     return BadRequest("User not found.");
                 }
-
-                // Find the game by GameId
+                
                 var game = await _dataContext.Games.FindAsync(joinGame.GameID);
                 if (game == null)
                 {
                     return BadRequest("Game not found.");
                 }
-
-                // Update game and save changes
                 game.User2 = user.Id;
                 game = _gameService.SetGameStart(game);
                 await _dataContext.SaveChangesAsync();

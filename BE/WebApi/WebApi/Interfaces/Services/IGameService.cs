@@ -12,12 +12,12 @@ public interface IGameService
 
     public Game CheckGame(Game game);
 
-    protected bool CheckIfStalemate(Game game);
+    protected bool CheckIfBoardIsFull(Game game);
 
-    protected bool CheckVertical(string[] board);
+    protected bool CheckVertical(Game game);
 
-    protected bool CheckHorizontal(string[] board);
-    protected bool CheckDiagnals(string[] board);
+    protected bool CheckHorizontal(Game game);
+    protected bool CheckDiagnals(Game game);
     
     public Task<IActionResult> MakeMove(PlayingModel playing);
 }

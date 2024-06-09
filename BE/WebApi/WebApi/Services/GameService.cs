@@ -35,19 +35,19 @@ public class GameService : IGameService
         }
     public Game CheckGame(Game game)
     {
-        if (CheckVertical(game.BoardState) || CheckHorizontal(game.BoardState) || CheckDiagnals(game.BoardState)) { 
+        if (CheckVertical(game) || CheckHorizontal(game) || CheckDiagnals(game)) { 
             game.GameState = GameState.Finnished; 
             game.GameFinish = DateTime.Now;
             game.Winner = game.CurrentTurn;
         }
-        else if (CheckIfStalemate(game))
+        else if (CheckIfBoardIsFull(game))
         {
             game.GameState = GameState.Draw;
             game.GameFinish = DateTime.Now;
         }
         return game;
     }
-    public bool CheckIfStalemate(Game game)
+    public bool CheckIfBoardIsFull(Game game)
     {
         foreach(var item in game.BoardState)
         {
@@ -55,28 +55,29 @@ public class GameService : IGameService
         }
         return true;
     }
-    public bool CheckVertical(string[] board)
+    public bool CheckVertical(Game game)
     {
-        for(int i = 0; i < board.Length; i += 3)
+        for(int i = 0; i < Math.Sqrt(game.BoardState.Length); i ++)
         {
-            if (board[0+i] == null || board[0+i].IsNullOrEmpty()) return false;
-            if (board[0+i] != null && board[0+i] == board[1+i] && board[1+i] == board[2+i]) return true;
+            if (game.BoardState[0+i] == null || game.BoardState[0+i].IsNullOrEmpty()) return false;
+            if (game.BoardState[i] != null && game.BoardState[i] == game.BoardState[3 + i] && game.BoardState[3 + i] == game.BoardState[6 + i]) return true;
         }
         return false;
     }
-    public bool CheckHorizontal(string[] board)
+    public bool CheckHorizontal(Game game)
     {
-        for (int i = 0; i < Math.Sqrt(board.Length); i ++)
+        for (int i = 0; i < game.BoardState.Length; i += 3)
         {
-            if (board[i] == null || board[i].IsNullOrEmpty()) return false;
-            if (board[i] != null && board[i] == board[3 + i] && board[3 + i] == board[6 + i]) return true;
+            if (game.BoardState[i] == null || game.BoardState[i].IsNullOrEmpty()) return false;
+            if (game.BoardState[0+i] != null && game.BoardState[0+i] == game.BoardState[1+i] && game.BoardState[1+i] == game.BoardState[2+i]) return true;
+            
         }
         return false;
     }
-    public bool CheckDiagnals(string[] board)
+    public bool CheckDiagnals(Game game)
     {
-        if (board[0] != null && board[0] == board[4] && board[4] == board[8]) return true;
-        if (board[2] != null && board[2] == board[4] && board[4] == board[6]) return true;
+        if (game.BoardState[0] != null && game.BoardState[0] == game.BoardState[4] && game.BoardState[4] == game.BoardState[8]) return true;
+        if (game.BoardState[2] != null && game.BoardState[2] == game.BoardState[4] && game.BoardState[4] == game.BoardState[6]) return true;
         return false;
     }
     public async Task<IActionResult> MakeMove(PlayingModel playing)
@@ -95,7 +96,7 @@ public class GameService : IGameService
         return new OkObjectResult(gameDb.GameState);
     }
 
-    protected async void HandleMove(Game gameDb)
+    public async Task<Game> HandleMove(Game gameDb)
     {
         if (gameDb.CurrentTurn == gameDb.User1)
         {
@@ -110,6 +111,6 @@ public class GameService : IGameService
         
         gameDb.GameUpdate = DateTime.Now;
         await _dataContext.SaveChangesAsync();
+        return gameDb;
     }
-        
 }

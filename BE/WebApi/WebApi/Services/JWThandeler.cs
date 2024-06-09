@@ -1,4 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace WebApi.Controllers
 {
@@ -19,6 +22,19 @@ namespace WebApi.Controllers
             }
             return null;
 
+        }
+        public static JwtSecurityToken GetToken(IEnumerable<Claim> authClaims, IConfiguration _configuration)
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: authClaims,
+                expires: DateTime.UtcNow.AddHours(3),
+                signingCredentials: signIn);
+            
+            return token;
         }
     }
 }
