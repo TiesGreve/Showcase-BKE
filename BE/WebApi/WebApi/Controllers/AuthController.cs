@@ -38,9 +38,9 @@ namespace WebApi.Controllers
         {
             if(ModelState.IsValid)
             {
-                Log.Information("Model Valid");
+                //Log.Information("Model Valid");
                 var user = await _userManager.FindByEmailAsync(loginModel.Email);
-                Log.Information("User Found");
+                //Log.Information("User Found");
                 if (user == null) return NotFound();
                 var result = await _signInManager.PasswordSignInAsync(user.UserName, loginModel.Password!, true, false);
                 if (result.Succeeded)

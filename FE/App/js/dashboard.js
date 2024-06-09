@@ -27,7 +27,9 @@ tempAdmin.innerHTML = `
     </table>
 `
 
-
+if(sessionStorage.getItem("token") == null){
+    ApiHandeler.Unauthorized();
+}
 
 var role = await ApiHandeler.GetRole();
 console.log(role)

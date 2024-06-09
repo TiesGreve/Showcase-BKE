@@ -11,7 +11,9 @@ using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using WebApi;
+using WebApi.Controllers;
 using WebApi.Data;
+using WebApi.Interfaces.Services;
 using WebApi.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
@@ -34,7 +36,9 @@ builder.Services.AddCors(options => {
 });
 
 builder.Services.AddControllers().AddNewtonsoftJson();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+builder.Services.AddScoped<IGameService, GameService>();
+
 builder.Services.AddEndpointsApiExplorer();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

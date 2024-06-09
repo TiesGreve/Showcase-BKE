@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Serilog;
 using WebApi.Data;
 using WebApi.Models;
 
@@ -35,6 +36,7 @@ namespace WebApi.Controllers
             var role = token.Claims.First(claim => claim.Type == ClaimTypes.Role).Value;
             if(role != "Admin")
             {
+                Log.Error("User that Requested not a Admin");
                 return Forbid();
             }
             var users = _userManager.Users.ToList();
