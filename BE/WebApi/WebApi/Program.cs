@@ -125,7 +125,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapIdentityApi<UserModel>();
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
