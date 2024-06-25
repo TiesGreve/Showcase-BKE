@@ -14,7 +14,7 @@ export default class ApiHandeler {
 
     static async LoginUser(email, password){
         try{
-            let response = await fetch(this.connectionString + "/api/Auth/login", {
+            let response = await fetch(this.connectionString + "/Auth/login", {
                 method: "POST",
                 headers: {
                     'accept' : 'application/json',
@@ -38,7 +38,7 @@ export default class ApiHandeler {
 
     static async RegisterUser(email, username, password, passwordRe){
         try{
-            let response = await fetch(this.connectionString + "/api/Auth/register", {
+            let response = await fetch(this.connectionString + "/Auth/register", {
                 method: "POST",
                 headers: {
                     'Accept' : 'application/json',
@@ -61,7 +61,7 @@ export default class ApiHandeler {
     static async GetUserId(){
         try{
             const token = sessionStorage.getItem('token');
-            const response = await fetch(this.connectionString + "/api/Auth/Id", {
+            const response = await fetch(this.connectionString + "/Auth/Id", {
                 method: "GET",
                 headers: {
                     'Accept' : 'application/json',
@@ -81,7 +81,7 @@ export default class ApiHandeler {
     static async GetOwnUsername(){
         try{
             const token = sessionStorage.getItem('token');
-            const response = await fetch(this.connectionString + "/api/Auth/Name", {
+            const response = await fetch(this.connectionString + "/Auth/Name", {
                 method: "GET",
                 headers: {
                     'Accept' : 'application/json',
@@ -101,7 +101,7 @@ export default class ApiHandeler {
     static async GetUsername(id){
         try{
             const token = sessionStorage.getItem('token');
-            const response = await fetch(this.connectionString + "/api/Auth/Name/" + id, {
+            const response = await fetch(this.connectionString + "/Auth/Name/" + id, {
                 method: "GET",
                 headers: {
                     'Accept' : 'application/json',
@@ -121,7 +121,7 @@ export default class ApiHandeler {
     static async CreateGame(){
         try{
             const token = sessionStorage.getItem('token');
-            const response = await fetch(this.connectionString + "/api/Game/Create", {
+            const response = await fetch(this.connectionString + "/Game/Create", {
                 method: "POST",
                 headers: {
                     'Accept' : 'application/json',
@@ -142,7 +142,7 @@ export default class ApiHandeler {
     static async JoinGame(guid){
         try{
             const token = sessionStorage.getItem('token');
-            const response = await fetch(this.connectionString + "/api/Game/Join",{
+            const response = await fetch(this.connectionString + "/Game/Join",{
                 method: "POST",
                 headers: {
                     'Accept' : 'application/json',
@@ -167,7 +167,7 @@ export default class ApiHandeler {
         try{
             const token = sessionStorage.getItem('token');
             let game = JSON.parse(sessionStorage.getItem("Game"));
-            let response = await fetch(this.connectionString + '/api/Game/Move',{
+            let response = await fetch(this.connectionString + '/Game/Move',{
                 method: "POST",
                 body: JSON.stringify({
                     Cell : cell,
@@ -192,7 +192,7 @@ export default class ApiHandeler {
         try{
             const token = sessionStorage.getItem('token');
             let game = JSON.parse(sessionStorage.getItem("Game"));
-            const response = await fetch(this.connectionString + '/api/Game/'+ game.id , {
+            const response = await fetch(this.connectionString + '/Game/'+ game.id , {
                 method: "GET",
                 headers:  {
                     'Accept' : 'application/json',
@@ -214,7 +214,7 @@ export default class ApiHandeler {
         grecaptcha.ready(function() {
             grecaptcha.execute('6LfKon4pAAAAAMl9e47gJG3eOx7ePgZ_dJTmuOBF', {action: 'submit'}).then(async function(token) {
                 try {
-                    const response = await fetch(this.connectionString + '/api/Captcha', {
+                    const response = await fetch(this.connectionString + '/Captcha', {
                         method: "POST",
                         body: JSON.stringify({
                             Recaptcha: token
@@ -246,7 +246,7 @@ export default class ApiHandeler {
         try{
             const token = sessionStorage.getItem('token');
             let game = JSON.parse(sessionStorage.getItem("Game"));
-            const response = await fetch(this.connectionString + '/api/Auth/Role' , {
+            const response = await fetch(this.connectionString + '/Auth/Role' , {
                 method: "GET",
                 headers:  {
                     'Accept' : 'application/json',
@@ -267,7 +267,7 @@ export default class ApiHandeler {
     static async GetUsers(){
         try{
             const token = sessionStorage.getItem('token');
-                const response = await fetch(this.connectionString + "/api/Admin/", {
+                const response = await fetch(this.connectionString + "/Admin/", {
                 method: "GET",
                 headers:  {
                     'Accept' : 'application/json',
@@ -287,7 +287,7 @@ export default class ApiHandeler {
     static async UpdateUserLockout(guid, lockout){
         try{
             const token = sessionStorage.getItem('token');
-            const response = await fetch(this.connectionString + "/api/Admin/" + guid, {
+            const response = await fetch(this.connectionString + "/Admin/" + guid, {
                 method: "GET",
                 headers:  {
                     'Accept' : 'application/json',
