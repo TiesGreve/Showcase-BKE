@@ -102,6 +102,11 @@ namespace WebApi.Controllers
             foreach(var claim in token.Claims) Log.Information(claim.Type + " -- "  + claim.Value);
             return Ok(role);
         }
+        [HttpGet("Test")]
+        public async Task<IActionResult> Test()
+        {
+            return Ok("Test");
+        }
 
     }
 }
