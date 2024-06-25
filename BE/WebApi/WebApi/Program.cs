@@ -138,6 +138,13 @@ using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().Creat
     ApplicationDBInitializer.SeedUsers(userManager);
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<DataContext>();
+    context.Database.Migrate();
+}
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
