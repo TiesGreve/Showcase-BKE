@@ -132,11 +132,6 @@ app.UseAuthorization();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.MapControllers();
-using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
-{
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
-    ApplicationDBInitializer.SeedUsers(userManager);
-}
 
 using (var scope = app.Services.CreateScope())
 {
@@ -144,6 +139,12 @@ using (var scope = app.Services.CreateScope())
 
     var context = services.GetRequiredService<DataContext>();
     context.Database.Migrate();
+}
+
+using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
+    ApplicationDBInitializer.SeedUsers(userManager);
 }
 
 Log.Logger = new LoggerConfiguration()
