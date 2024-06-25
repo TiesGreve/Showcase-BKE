@@ -45,10 +45,10 @@ namespace WebApi.Controllers
 
         // PUT api/<AdminController>/5
         [HttpPut("{id}")]
-        public void Put(Guid id, [FromBody] bool value)
+        public void Put(Guid id)
         {
             var user = _userManager.Users.Where(u => u.Id == id).First();
-            user.LockoutEnabled = value;
+            user.LockoutEnabled = !user.LockoutEnabled;
         }
 
     }
