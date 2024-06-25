@@ -32,7 +32,7 @@ builder.Services.AddCors(options => {
                             .WithMethods("POST") // defining the allowed HTTP method
                             .WithMethods("GET")
                             .AllowAnyHeader(); // allowing any header to be sent
-                      });
+             });
 });
 
 builder.Services.AddControllers().AddNewtonsoftJson();
