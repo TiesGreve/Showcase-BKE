@@ -1,4 +1,3 @@
-import { Children } from "react";
 
 export default function Body({
     children,

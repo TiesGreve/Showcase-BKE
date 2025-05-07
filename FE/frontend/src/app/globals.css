@@ -24,11 +24,41 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-h1{
-  font-size: 56px;
-}
-.button{
+
+button{
   margin: 5px;
   min-width: 150px;
   font-size: larger;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem; 
+  padding-left: 1.25rem;
+  padding-right: 1.25rem; 
+  border-radius: 0.5rem; 
+  width: 100%; 
+  font-size: 0.875rem;
+  line-height: 1.25rem; 
+  font-weight: 500; 
+  text-align: center; 
+  color: #ffffff; 
+  background-color: #1D4ED8; 
+
+  @media (min-width: 640px) { 
+    width: auto; 
+  }
+}
+button:hover {
+  background-color: #1E40AF; 
+}
+button:disabled{
+  background-color: lightgray;
+}
+
+h1{
+  font-size: 56px;
+}
+input{
+  background-color: white;
+  color: black;
+  border-radius: 5px;
+  padding: 5px;
 }
