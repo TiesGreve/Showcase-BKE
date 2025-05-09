@@ -51,7 +51,7 @@ public class GameService : IGameService
     {
         foreach(var item in game.BoardState)
         {
-            if(item == null || item.Equals(string.Empty)) return false;
+            if(string.IsNullOrEmpty(item)) return false;
         }
         return true;
     }
@@ -59,8 +59,8 @@ public class GameService : IGameService
     {
         for(int i = 0; i < Math.Sqrt(game.BoardState.Length); i ++)
         {
-            if (game.BoardState[0+i] == null || game.BoardState[0+i].IsNullOrEmpty()) return false;
-            if (game.BoardState[i] != null && game.BoardState[i] == game.BoardState[3 + i] && game.BoardState[3 + i] == game.BoardState[6 + i]) return true;
+            if (!string.IsNullOrEmpty(game.BoardState[i]) || game.BoardState[0+i].IsNullOrEmpty()) continue;
+            if (!string.IsNullOrEmpty(game.BoardState[i]) && game.BoardState[i] == game.BoardState[3 + i] && game.BoardState[3 + i] == game.BoardState[6 + i]) return true;
         }
         return false;
     }
@@ -68,16 +68,16 @@ public class GameService : IGameService
     {
         for (int i = 0; i < game.BoardState.Length; i += 3)
         {
-            if (game.BoardState[i] == null || game.BoardState[i].IsNullOrEmpty()) return false;
-            if (game.BoardState[0+i] != null && game.BoardState[0+i] == game.BoardState[1+i] && game.BoardState[1+i] == game.BoardState[2+i]) return true;
+            if (!string.IsNullOrEmpty(game.BoardState[i]) || game.BoardState[i].IsNullOrEmpty()) continue;
+            if (!string.IsNullOrEmpty(game.BoardState[i]) && game.BoardState[i] == game.BoardState[1+i] && game.BoardState[1+i] == game.BoardState[2+i]) return true;
             
         }
         return false;
     }
     public bool CheckDiagnals(Game game)
     {
-        if (game.BoardState[0] != null && game.BoardState[0] == game.BoardState[4] && game.BoardState[4] == game.BoardState[8]) return true;
-        if (game.BoardState[2] != null && game.BoardState[2] == game.BoardState[4] && game.BoardState[4] == game.BoardState[6]) return true;
+        if (!string.IsNullOrEmpty(game.BoardState[0]) && game.BoardState[0] == game.BoardState[4] && game.BoardState[4] == game.BoardState[8]) return true;
+        if (!string.IsNullOrEmpty(game.BoardState[2]) && game.BoardState[2] == game.BoardState[4] && game.BoardState[4] == game.BoardState[6]) return true;
         return false;
     }
     public async Task<IActionResult> MakeMove(PlayingModel playing)
