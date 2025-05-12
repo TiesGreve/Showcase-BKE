@@ -38,24 +38,6 @@ const UserProvider = (({children} : UserProviderProps) => {
             Password: password,
         })
     }
-    
-    function ValidateInput(email: string, password: string, passwordComfirmation: string){
-        try{
-            if(!ValidateEmail(email)){
-                throw new ValidationError("Invalid Email")
-            }
-            if(!ValidatePassword(password)){
-                throw new ValidationError("Invalid password")
-            }
-            if(password != passwordComfirmation){
-                throw new ValidationError("Passwords don't match")
-            }
-            return true
-        }
-        catch(err){
-            return err as ValidationError
-        }
-    }
 
     return (
         <UserContext.Provider value={{}}>
