@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,7 @@ builder.Services.AddCors(options => {
                       builder => {
                           builder
                             .WithOrigins("http://localhost:5500") // specifying the allowed origin
+                            .WithOrigins("http://localhost:5264") // specifying the allowed origin
                             .WithOrigins("http://127.0.0.1:5500") // specifying the allowed origin
                             .WithOrigins("https://showcase-bke.pages.dev")
                             .WithMethods("POST") // defining the allowed HTTP method
@@ -38,11 +40,14 @@ builder.Services.AddCors(options => {
 builder.Services.AddControllers().AddNewtonsoftJson();
 
 builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddEndpointsApiExplorer();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContextPool<DataContext>(opt =>
+    opt.UseNpgsql(connectionString, o => o.SetPostgresVersion(17, 4)));
+//builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(connectionString));
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -101,9 +106,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 12;
-    options.Password.RequiredUniqueChars = 1;
 });
-
 
 builder.Services.AddIdentityApiEndpoints<UserModel>(options =>
 {
@@ -122,8 +125,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.MapIdentityApi<UserModel>();
 
 app.UseHttpsRedirection();
 

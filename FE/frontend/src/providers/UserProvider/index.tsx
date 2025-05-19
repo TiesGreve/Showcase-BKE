@@ -1,5 +1,4 @@
 'use client'
-import axios from "axios"
 import { useRouter } from "next/router"
 import { ReactNode, createContext, useState } from "react"
 import Cookies from 'js-cookie'
@@ -23,7 +22,7 @@ const UserProvider = (({children} : UserProviderProps) => {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [twoFaCode, setTwoFaCode] = useState('');
-
+    
     let accessToken = Cookies.get("accessToken")
     let role;
     if(accessToken){
@@ -32,12 +31,30 @@ const UserProvider = (({children} : UserProviderProps) => {
         else if(role === "Admin") router.push("/admin");
     }
 
-    function LoginUser(email: string, password: string){
-        axios.post('/api/auth/login',{
-            Email: email,
-            Password: password,
-        })
+    async function LoginUser(email: string, password: string){
+        try{
+            let response = await fetch(process.env.API_URL + "/Auth/login", {
+                method: "POST",
+                headers: {
+                    'accept' : 'application/json',
+                    'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({
+                    Email: email,
+                    Password: password
+                })
+            })
+            let result = await response.json();
+            if (response.ok){
+                sessionStorage.setItem("token", result)
+            }
+            return response.ok
+        }
+        catch(e){
+
+        }
     }
+
 
     return (
         <UserContext.Provider value={{}}>

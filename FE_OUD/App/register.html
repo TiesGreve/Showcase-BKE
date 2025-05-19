@@ -21,21 +21,33 @@
                     <back-button></back-button>
                     <form action="" method="post">
                         <div>
-                            <label for="UserName">Username*</label>
-                            <input type="text" id="UserName" required>
+                            <label id="UserName-label" class="tooltip" for="UserName">Username*
+                                <span class="tooltiptext">Username can be between 3 and 24 characters long.
+                                </span>
+                            </label>
+                            <input type="text" id="UserName" required maxlength="24" minlength="3">
                         </div>
                         <div>
-                            <label for="Email">Email*</label>
-                            <input type="text" id="Email" required>
+                            <label id="Email-label" for="Email">Email*</label>
+                            <input type="text" id="Email" required maxlength="128">
                         </div>
                         <div>
-                            <label for="Password">Password*</label>
-                            <input type="password" id="Password" required>
+                            <label id="Password-label" class="tooltip" for="Password">Password*
+                                <span class="tooltiptext">
+                                    Password must: <br> 
+                                    - contain one Uppercase letter <br>
+                                    - contain one Number <br>
+                                    - contain one Special Character <br>
+                                    - Be atleast 12 characters long
+                                </span>
+                            </label>
+                            <input type="password" id="Password" required minlength="12">
                         </div>
                         <div>
-                            <label for="PasswordCheck"> Repeat Password*</label>
-                            <input type="password" id="PasswordCheck" required>
+                            <label id="PasswordCheck-Label" for="PasswordCheck">Repeat Password*</label>
+                            <input type="password" id="PasswordCheck" required minlength="12">
                         </div>
+                        <p id="Error-Message" class="Error-Message"></p>
                         <input class="home-button" type="submit" id="Submit" disabled = true value="Registreer">
                     </form>
                 </start-screen>

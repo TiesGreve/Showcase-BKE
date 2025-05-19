@@ -5,11 +5,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using WebApi.Data;
+using WebApi.Interfaces.Services;
 using WebApi.Models;
 
 namespace WebApi.Controllers;
 
-public class AuthService
+public class AuthService: IAuthService
 {
     private readonly UserManager<UserModel> _userManager;
     private readonly SignInManager<UserModel> _signInManager;
@@ -86,6 +87,7 @@ public class AuthService
             await _signInManager.SignInAsync(user, false);
             return new OkResult();
         }
-        return RequestService.ReturnBadRequest(nameof(RegisterUser), "Registreren niet gelukt");
+        Log.Error($"Couldn't fetch User with email {user.Email}");
+        return RequestService.ReturnBadRequest(nameof(RegisterUser), "Register Failed: " + result.Errors.First().Description);
     }
 }

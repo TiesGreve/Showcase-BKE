@@ -22,3 +22,8 @@ export function ValidateEmail(email: string){
     let regex = /e/
     return regex.test(email)
 }
+
+export function Unauthorized(){
+    sessionStorage.removeItem("token");
+    window.location.href = "";
+}

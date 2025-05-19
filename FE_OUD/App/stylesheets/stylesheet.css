@@ -18,7 +18,8 @@ hr {
     flex-direction: column;
     width: 50%;
     min-width: 300px;
-    height: 60vh;
+    max-height: 80vh;
+    height: 80vh;
     align-self: center;
 
 }
@@ -117,8 +118,7 @@ label {
     font-size: 12px;
     font-weight: bold;
     color: #273e3f;
-    margin-left: 5px;
-    margin-right: 5px;
+    margin:5px;
 }
 
 h3{
@@ -183,4 +183,34 @@ p{
 th {
     
     font-family: "Robot";
+}
+.Error-Message{
+    color: red;
+    height: 60px;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: rgba(84, 84, 84, 0.85);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: left;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: 105%;
+}
+.tooltip:hover .tooltiptext {
+    visibility: visible;
 }

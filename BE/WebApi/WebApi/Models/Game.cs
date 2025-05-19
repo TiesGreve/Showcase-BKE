@@ -17,13 +17,13 @@ namespace WebApi.Models
         public static int boardSize = 3;
         public string[] BoardState {  get; set; }
         public GameState GameState {  get; set; }
-        [Column(TypeName = "DateTime")]
+        [Column(TypeName = "timestamp")]
         public DateTime GameCreation {  get; set; }
-        [Column(TypeName = "DateTime")]
+        [Column(TypeName = "timestamp")]
         public DateTime? GameStart {  get; set; }
-        [Column(TypeName = "DateTime")]
+        [Column(TypeName = "timestamp")]
         public DateTime? GameUpdate { get; set; }
-        [Column(TypeName = "DateTime")]
+        [Column(TypeName = "timestamp")]
         public DateTime? GameFinish { get; set; }
     }
     public enum GameState

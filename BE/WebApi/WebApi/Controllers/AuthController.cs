@@ -11,6 +11,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http.HttpResults;
 using WebApi.Data;
 using WebApi.Models;
+using WebApi.Interfaces.Services;
 
 namespace WebApi.Controllers
 {
@@ -20,9 +21,9 @@ namespace WebApi.Controllers
     {
         private readonly UserManager<UserModel> _userManager;
         private readonly SignInManager<UserModel> _signInManager;
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
 
-        public AuthController(UserManager<UserModel> userManager, SignInManager<UserModel> signInManager, IConfiguration configuration, DataContext dataContext, AuthService authService)
+        public AuthController(UserManager<UserModel> userManager, SignInManager<UserModel> signInManager, IAuthService authService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -105,7 +106,8 @@ namespace WebApi.Controllers
         [HttpGet("Test")]
         public async Task<IActionResult> Test()
         {
-            return Ok("Test");
+            var user = await _userManager.FindByEmailAsync("admin@BKE.com");
+            return Ok(user);
         }
 
     }
