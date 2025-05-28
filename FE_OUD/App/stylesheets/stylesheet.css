@@ -189,6 +189,10 @@ th {
     height: 60px;
 }
 
+.Error-Input{
+    border: 1px solid red;
+}
+
 .tooltip {
     position: relative;
     display: inline-block;

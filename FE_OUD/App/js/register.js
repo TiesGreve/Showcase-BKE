@@ -42,22 +42,54 @@ function PasswordRegex(){
 function ComparePasswords(){
     return password.value == passwordRe.value;
 }
+
+function ValidatePassword(){
+    if(!PasswordRegex()) {
+        showError(password, "check password")
+        return false;
+    }
+    else if(!ComparePasswords()){
+        showError(password, "")
+        showError(passwordRe, "niet goed")
+        return false;
+    }
+    return true;
+}
 function CheckOnScripting(input) {
     if(input.indexOf('<') != -1 && input.indexOf('>') != -1){
         return true;
     }
     return false;
 }
+function showError(element, message){
+    element.classList.add("Error-Input");
+    let errorBox = document.querySelector("#Error-Message")
+    if(errorBox.innerText == ""){
+        errorBox.innerText = message;
+    }
+    console.log(message)
+}
+function removeError(){
+    inputs.forEach(element => {
+        element.classList.remove("Error-Input")
+    });
+    document.querySelector("#Error-Message").innerText = "";
+}
 
 form.addEventListener("submit", async (event) => {
+    
     event.preventDefault();
     inputs.forEach(input => {
         if (!input.checkVisibility() && input.innerText != "") {
             // If it isn't, we display an appropriate error message
-            showError(input);
+            showError(input, "Niet alles is ingevuld");
             return;
         }
+        if(CheckOnScripting(input.innerText)){
+            showError(input, `'<' en  '>' zijn niet toegestaan`)
+        }
     })
+    if(!ValidatePassword()) return
     
     if (ApiHandeler.GetCaptchaResult()) {
         setTimeout(async () => {
