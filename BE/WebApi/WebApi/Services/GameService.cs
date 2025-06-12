@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WebApi.Data;
 using WebApi.Interfaces.Services;
 using WebApi.Models;
+using WebApi.Models.DTO;
 
 namespace WebApi.Controllers;
 
@@ -112,5 +114,23 @@ public class GameService : IGameService
         gameDb.GameUpdate = DateTime.Now;
         await _dataContext.SaveChangesAsync();
         return gameDb;
+    }
+    public async Task<StatsModel> CalculatePlayerStats(Guid guid)
+    {
+        StatsModel playerStats = new StatsModel();
+
+        var games = _dataContext.Games.Where(g => (g.User1 == guid || g.User2 == guid) && g.GameState != GameState.Starting);
+        playerStats.TotalGames = await games.Where(g =>  g.GameState != GameState.Starting).CountAsync();
+        playerStats.WinCount = await games.Where(g => g.Winner == guid).CountAsync();
+        playerStats.TieCount = await games.Where(g => g.GameState == GameState.Draw).CountAsync();
+        playerStats.LossCount = playerStats.TotalGames - playerStats.WinCount - playerStats.TieCount;
+
+        var playTimes = games
+        .Where(g => g.GameStart.HasValue && g.GameFinish.HasValue)
+        .Select(g => (g.GameFinish.Value - g.GameStart.Value).TotalSeconds);
+        playerStats.AverageTimeInS = (int) Math.Round(playTimes.Average());
+        playerStats.ShortestTimeInS = (int)Math.Round(playTimes.Min());
+
+        return playerStats;
     }
 }

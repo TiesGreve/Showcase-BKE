@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DotNetEnv;
+using Microsoft.AspNetCore.Identity;
 using WebApi.Models;
 
 namespace WebApi
@@ -7,16 +8,17 @@ namespace WebApi
     {
         public static void SeedUsers(UserManager<UserModel> userManager)
         {
-            if (userManager.FindByEmailAsync("admin@BKE.com").Result == null)
+            Env.Load();
+            if (userManager.FindByEmailAsync(Environment.GetEnvironmentVariable("SEED_USER_EMAIL")).Result == null)
             {
                 UserModel user = new UserModel
                 {
-                    UserName = "admin@BKE.com",
-                    Email = "admin@BKE.com",
+                    UserName = Environment.GetEnvironmentVariable("SEED_USER_EMAIL"),
+                    Email = Environment.GetEnvironmentVariable("SEED_USER_EMAIL"),
                     EmailConfirmed = true
                 };
 
-                IdentityResult result = userManager.CreateAsync(user, "String!!1234").Result;
+                IdentityResult result = userManager.CreateAsync(user, Environment.GetEnvironmentVariable("SEED_USER_PASSWORD")).Result;
 
                 if (result.Succeeded)
                 {

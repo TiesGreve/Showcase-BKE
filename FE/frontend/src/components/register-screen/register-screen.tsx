@@ -22,7 +22,9 @@ export default function RegisterScreen(){
             return err as ValidationError
         }
     }
-    
+    function SetError(){
+        
+    }
 
     return (
         <form action="" className="flex flex-col">

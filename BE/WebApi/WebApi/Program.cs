@@ -1,3 +1,4 @@
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,8 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Env.Load();
+
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 // Add services to the container.
@@ -28,9 +31,9 @@ builder.Services.AddCors(options => {
                       builder => {
                           builder
                             .WithOrigins("http://localhost:5500") // specifying the allowed origin
-                            .WithOrigins("http://localhost:5264") // specifying the allowed origin
                             .WithOrigins("http://127.0.0.1:5500") // specifying the allowed origin
                             .WithOrigins("https://showcase-bke.pages.dev")
+                            .WithOrigins("*")
                             .WithMethods("POST") // defining the allowed HTTP method
                             .WithMethods("GET")
                             .AllowAnyHeader(); // allowing any header to be sent
@@ -44,7 +47,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddEndpointsApiExplorer();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 builder.Services.AddDbContextPool<DataContext>(opt =>
     opt.UseNpgsql(connectionString, o => o.SetPostgresVersion(17, 4)));
 //builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(connectionString));
@@ -89,9 +92,10 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        
+        ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+        ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")))
     };
 });
 
@@ -119,6 +123,12 @@ builder.Services.AddIdentityApiEndpoints<UserModel>(options =>
 
 var app = builder.Build();
 
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/Acceslog.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+Log.Information("Start of system.");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -139,6 +149,8 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var context = services.GetRequiredService<DataContext>();
+    Log.Information(connectionString);
+    Log.Information("Handige informatie");
     context.Database.Migrate();
 }
 
@@ -147,10 +159,4 @@ using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().Creat
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
     ApplicationDBInitializer.SeedUsers(userManager);
 }
-
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .WriteTo.File("logs/Acceslog.txt", rollingInterval: RollingInterval.Day)
-    .CreateLogger();
-Log.Information("Start of system.");
 app.Run();

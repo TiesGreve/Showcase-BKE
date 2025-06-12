@@ -20,4 +20,6 @@ public interface IGameService
     protected bool CheckDiagnals(Game game);
     
     public Task<IActionResult> MakeMove(PlayingModel playing);
+
+    public Task<IActionResult> CalculatePlayerStats(Guid guid);
 }

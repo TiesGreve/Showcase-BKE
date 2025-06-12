@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using DotNetEnv;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,13 +28,15 @@ public class AuthService: IAuthService
 
     public async Task<IActionResult> LoginUser(LoginModel loginModel)
     {
+        Env.Load();
         var user = await _userManager.FindByEmailAsync(loginModel.Email);
         if (user == null) return new NotFoundObjectResult("Combinatie van Wachtwoord en Email is niet correct");
+
         var result = await _signInManager.PasswordSignInAsync(user.UserName, loginModel.Password!, true, false);
         if (result.Succeeded)
         {
             Log.Information("Password Correct ");
-                    
+
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
@@ -41,17 +44,16 @@ public class AuthService: IAuthService
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Expiration, DateTime.UtcNow.AddHours(3).ToString("ddd dd MMM yyyy HH:mm:ss")),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Aud, _configuration["Jwt:Audience"]),
-                new Claim(JwtRegisteredClaimNames.Iss, _configuration["Jwt:Issuer"])
+                new Claim(JwtRegisteredClaimNames.Aud, Environment.GetEnvironmentVariable("JWT_AUDIENCE")),
+                new Claim(JwtRegisteredClaimNames.Iss, Environment.GetEnvironmentVariable("JWT_ISSUER"))
             };
+            Log.Information($"Login user: {user.UserName}");
             List<Guid> roleIDs;
             if (_dataContext.UserRoles != null)
             {
-                Console.WriteLine("hij zit er in hoor");
                 roleIDs = _dataContext.UserRoles.Where(r => r.UserId == user.Id).Select(r => r.RoleId).ToList();
             }
             else roleIDs = new List<Guid>();
-            
             if (roleIDs.Count > 0)
             {
                 var role = await _userManager.GetRolesAsync(user);

@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using DotNetEnv;
 using Microsoft.IdentityModel.Tokens;
 
 namespace WebApi.Controllers
@@ -25,11 +26,12 @@ namespace WebApi.Controllers
         }
         public static JwtSecurityToken GetToken(IEnumerable<Claim> authClaims, IConfiguration _configuration)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            Env.Load();
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")));
             var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                audience: Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
                 claims: authClaims,
                 expires: DateTime.UtcNow.AddHours(3),
                 signingCredentials: signIn);

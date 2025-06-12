@@ -6,7 +6,7 @@
 // * long polling
 
 export default class ApiHandeler {
-    //static connectionString = "https://tiesshowcase.hbo-ict.org";
+    //static connectionString = "https://ties.hbo-ict.link/api";
     static connectionString = "http://localhost:5264/api";
     constructor(){
         

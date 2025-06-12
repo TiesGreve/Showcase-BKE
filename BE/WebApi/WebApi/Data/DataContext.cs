@@ -16,6 +16,17 @@ namespace WebApi.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            foreach(var entity in builder.Model.GetEntityTypes())
+            {
+                foreach (var property in entity.GetProperties()
+                    .Where(p => p.ClrType == typeof(DateTime) ||
+                                p.ClrType == typeof(DateTime?)))
+                {
+                    property.SetColumnType("timestamp without time zone");
+                }
+            }
+
             builder.Entity<UserModel>(entity =>
             {
                 entity.HasMany(e => e.Player1Games)

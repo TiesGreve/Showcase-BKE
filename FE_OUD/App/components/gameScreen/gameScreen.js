@@ -1,4 +1,3 @@
-import ApiHandeler from "../../js/data";
 let temp = document.createElement("template");
 temp.innerHTML = `
 <div class="game-screen"></div>

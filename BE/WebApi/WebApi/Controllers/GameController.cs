@@ -127,6 +127,15 @@ namespace WebApi.Controllers
             if(result == null) return NotFound();
             return Ok(result);
         }
+        [Authorize]
+        [HttpGet("Stats")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetPlayerStats(Guid guid)
+        {
+            
+        }
         
     }
 }
