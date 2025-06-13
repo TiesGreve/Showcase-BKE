@@ -5,6 +5,10 @@ using System.Security.Claims;
 using Serilog;
 using WebApi.Data;
 using WebApi.Models;
+using System.IdentityModel.Tokens.Jwt;
+using WebApi.Interfaces.Services;
+using WebApi.Services;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -12,43 +16,47 @@ namespace WebApi.Controllers
 {
     
     [Route("api/[controller]")]
+    [Authorize(Roles ="Admin")]
     [ApiController]
-    [Authorize]
     public class AdminController : ControllerBase
     {
         private readonly UserManager<UserModel> _userManager;
-        private readonly SignInManager<UserModel> _signInManager;
-        private readonly IConfiguration _configuration;
-        private readonly DataContext _dataContext;
+        private readonly IAdminService _adminService;
 
-        public AdminController(UserManager<UserModel> userManager, SignInManager<UserModel> signInManager, IConfiguration configuration, DataContext dataContext)
+        public AdminController(UserManager<UserModel> userManager, IAdminService adminService)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
-            _configuration = configuration;
-            _dataContext = dataContext;
+            _adminService = adminService;
         }
-        // GET: api/<AdminController>
+
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
-            var role = token.Claims.First(claim => claim.Type == ClaimTypes.Role).Value;
-            if(role != "Admin")
+            JwtSecurityToken token = await JWThandeler.GetTokenClaims(HttpContext.Request);
+            bool isAdmin = await _adminService.ValidateUserIsAdmin(token);
+            if (!isAdmin)
+            { 
+                Log.Error("User that Requested not a Admin");
+                return Forbid();
+            }
+            var users = await _userManager.Users.ToListAsync();
+            return Ok(users);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(Guid id)
+        {
+            JwtSecurityToken token = await JWThandeler.GetTokenClaims(HttpContext.Request);
+            bool isAdmin = await _adminService.ValidateUserIsAdmin(token);
+            if (isAdmin)
             {
                 Log.Error("User that Requested not a Admin");
                 return Forbid();
             }
-            var users = _userManager.Users.ToList();
-            return Ok(users);
-        }
-
-        // PUT api/<AdminController>/5
-        [HttpPut("{id}")]
-        public void Put(Guid id)
-        {
-            var user = _userManager.Users.Where(u => u.Id == id).First();
+            UserModel user = _userManager.Users.Where(u => u.Id == id).First();
             user.LockoutEnabled = !user.LockoutEnabled;
+            user.UpdatedAt = DateTime.UtcNow;
+            return Ok();
         }
 
     }

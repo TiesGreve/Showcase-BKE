@@ -18,6 +18,7 @@ using WebApi.Controllers;
 using WebApi.Data;
 using WebApi.Interfaces.Services;
 using WebApi.Models;
+using WebApi.Services;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,19 +32,20 @@ builder.Services.AddCors(options => {
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       builder => {
                           builder
-                            .WithOrigins("http://localhost:5500") // specifying the allowed origin
                             .WithOrigins("http://127.0.0.1:5500") // specifying the allowed origin
                             .WithOrigins("https://showcase-bke.pages.dev")
-                            .WithMethods("POST") // defining the allowed HTTP method
-                            .WithMethods("GET")
+                            .WithOrigins("https://showcasebke.nl")
+                            .AllowAnyMethod()
                             .AllowAnyHeader(); // allowing any header to be sent
              });
 });
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 
+builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -149,8 +151,6 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var context = services.GetRequiredService<DataContext>();
-    Log.Information(connectionString);
-    Log.Information("Handige informatie");
     context.Database.Migrate();
 }
 
@@ -159,4 +159,5 @@ using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().Creat
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
     ApplicationDBInitializer.SeedUsers(userManager);
 }
+Log.Information("Application running");
 app.Run();

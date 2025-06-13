@@ -289,7 +289,7 @@ export default class ApiHandeler {
     static async GetUsers(){
         try{
             const token = sessionStorage.getItem('token');
-                const response = await fetch(this.connectionString + "/Admin/", {
+                const response = await fetch(this.connectionString + "/Admin", {
                 method: "GET",
                 headers:  {
                     'Accept' : 'application/json',

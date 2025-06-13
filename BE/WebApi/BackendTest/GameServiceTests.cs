@@ -34,7 +34,7 @@ public class Tests
         
         Assert.IsNotNull(game.CurrentTurn);
         Assert.IsNotNull(game.FirstMove);
-        Assert.IsNotNull(game.GameStart);
+        Assert.IsNotNull(game.StartedAt);
         Assert.That(actual: game.FirstMove, Is.EqualTo(game.CurrentTurn));
     }
     

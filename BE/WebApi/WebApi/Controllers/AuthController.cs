@@ -66,6 +66,7 @@ namespace WebApi.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {   
             await _signInManager.SignOutAsync();
@@ -101,7 +102,6 @@ namespace WebApi.Controllers
         {
             var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
             var role = token.Claims.First(claim => claim.Type == ClaimTypes.Role);
-            foreach(var claim in token.Claims) Log.Information(claim.Type + " -- "  + claim.Value);
             return Ok(role);
         }
         [HttpGet("Test")]

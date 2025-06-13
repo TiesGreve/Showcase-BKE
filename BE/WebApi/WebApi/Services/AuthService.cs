@@ -39,7 +39,7 @@ public class AuthService: IAuthService
             var token = await this.GenerateToken(user);
             return new OkObjectResult(new JwtSecurityTokenHandler().WriteToken(token));
         }
-
+        Log.Error($"Authservice - LoginUser - Login van gebruiker {user.UserName} mislukt");
         return new NotFoundObjectResult("Combinatie van Wachtwoord en Email is niet correct");
     }
     public async Task<IActionResult> RefreshToken(UserModel user)
@@ -52,7 +52,6 @@ public class AuthService: IAuthService
         var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Expiration, DateTime.UtcNow.AddMinutes(30).ToString("ddd dd MMM yyyy HH:mm:ss")),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -95,7 +94,7 @@ public class AuthService: IAuthService
             await _signInManager.SignInAsync(user, false);
             return new OkResult();
         }
-        Log.Error($"Couldn't fetch User with email {user.Email}");
+        Log.Error($"Authservice - RegisterUser - Couldn't fetch User with email {user.Email}");
         return RequestService.ReturnBadRequest(nameof(RegisterUser), "Register Failed: " + result.Errors.First().Description);
     }
 }

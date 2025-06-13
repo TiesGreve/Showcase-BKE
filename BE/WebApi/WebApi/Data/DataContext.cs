@@ -12,7 +12,10 @@ namespace WebApi.Data
         public DbSet<UserModel> Users {  get; set; }
         public DbSet<Game> Games { get; set; }
         
-
+        static DataContext()
+        {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -6,18 +6,19 @@ namespace WebApi.Models
     {
         [Required]
         [EmailAddress]
-        [MaxLength(128)]
+        [MaxLength(80)]
         public string Email { get; set; }
         [Required]
-        [MinLength(3)]
-        [MaxLength(24)]
+        [MinLength(1)]
+        [MaxLength(50)]
         public string UserName { get; set; }
         [Required]
         [MinLength(12)]
-
+        [MaxLength(128)]
         public string Password { get; set; }
         [Required]
         [MinLength(12)]
+        [MaxLength(128)]
         public string PasswordCheck { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using WebApi.Data;
 using WebApi.Interfaces.Services;
 using WebApi.Models;
@@ -32,20 +33,20 @@ public class GameService : IGameService
                 game.GameState = GameState.Player2Move;
                 game.CurrentTurn = game.User2;
             }
-            game.GameStart = DateTime.Now;
+            game.StartedAt = DateTime.UtcNow;
             return game;
         }
     public Game CheckGame(Game game)
     {
         if (CheckVertical(game) || CheckHorizontal(game) || CheckDiagnals(game)) { 
             game.GameState = GameState.Finnished; 
-            game.GameFinish = DateTime.Now;
+            game.FinishedAt = DateTime.UtcNow;
             game.Winner = game.CurrentTurn;
         }
         else if (CheckIfBoardIsFull(game))
         {
             game.GameState = GameState.Draw;
-            game.GameFinish = DateTime.Now;
+            game.FinishedAt = DateTime.UtcNow;
         }
         return game;
     }
@@ -85,15 +86,30 @@ public class GameService : IGameService
     public async Task<IActionResult> MakeMove(PlayingModel playing)
     {
         Game? gameDb = _dataContext.Games.Find(playing.GameID);
-        if (playing.Cell is > 8 or < 0) return RequestService.ReturnBadRequest(nameof(MakeMove), "Illegal move");
-        if (gameDb == null) return RequestService.ReturnBadRequest(nameof(MakeMove), "Game not found");
-        if (gameDb.User2 == null) return RequestService.ReturnBadRequest(nameof(MakeMove), "No second user in game");
-        if (gameDb.BoardState[playing.Cell] != null) return RequestService.ReturnBadRequest(nameof(MakeMove), "Cell already filled in");
+        if (gameDb == null)
+        {
+            Log.Warning($"GameService - MakeMove - player with id {gameDb.User1} tried to make a move in nonexisting game");
+            return RequestService.ReturnBadRequest(nameof(MakeMove), "Game not found");
+        }
+        if (gameDb.User2 == null)
+        {
+            Log.Warning($"GameService - MakeMove - player with id {gameDb.User1} tried to make a move before game started");
+            return RequestService.ReturnBadRequest(nameof(MakeMove), "No second user in game");
+        }
+        if (playing.Cell is > 8 or < 0)
+        {
+            Log.Warning($"GameService - MakeMove - player with id {gameDb.CurrentTurn} tried to make an illegal move");
+            return RequestService.ReturnBadRequest(nameof(MakeMove), "Illegal move");
+        }
+        if (gameDb.BoardState[playing.Cell] != null) {
+            Log.Warning($"GameService - MakeMove - player with id {gameDb.CurrentTurn} tried to fill a cell thats already filled in");
+            return RequestService.ReturnBadRequest(nameof(MakeMove), "Cell already filled in");
+        }
         if (gameDb.CurrentTurn == gameDb.User1) gameDb.BoardState[playing.Cell] = "x";
         else gameDb.BoardState[playing.Cell] = "o";
 
         gameDb = CheckGame(gameDb);
-        if (gameDb.GameFinish != null) HandleMove(gameDb);
+        if (gameDb.FinishedAt != null) HandleMove(gameDb);
         
         return new OkObjectResult(gameDb.GameState);
     }
@@ -111,7 +127,7 @@ public class GameService : IGameService
             gameDb.GameState = GameState.Player1Move;
         }
         
-        gameDb.GameUpdate = DateTime.Now;
+        gameDb.UpdatedAt = DateTime.UtcNow;
         await _dataContext.SaveChangesAsync();
         return gameDb;
     }
@@ -126,8 +142,8 @@ public class GameService : IGameService
         playerStats.LossCount = playerStats.TotalGames - playerStats.WinCount - playerStats.TieCount;
 
         var playTimes = games
-        .Where(g => g.GameStart.HasValue && g.GameFinish.HasValue)
-        .Select(g => (g.GameFinish.Value - g.GameStart.Value).TotalSeconds);
+        .Where(g => g.StartedAt.HasValue && g.FinishedAt.HasValue)
+        .Select(g => (g.FinishedAt.Value - g.FinishedAt.Value).TotalSeconds);
         playerStats.AverageTimeInS = (int) Math.Round(playTimes.Average());
         playerStats.ShortestTimeInS = (int)Math.Round(playTimes.Min());
 

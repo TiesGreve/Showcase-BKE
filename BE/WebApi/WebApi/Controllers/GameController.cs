@@ -48,7 +48,6 @@ namespace WebApi.Controllers
                 var id = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
                 var name = _userManager.FindByIdAsync(id);
                 var guid = name.Result.Id;
-                Log.Information($"{guid}: voor dit potje");
                 Game game = new Game()
                 {
                     Id = Guid.NewGuid(),
@@ -56,7 +55,7 @@ namespace WebApi.Controllers
                     TurnCount = 0,
                     BoardState = new string[Game.boardSize * Game.boardSize],
                     GameState = GameState.Starting,
-                    GameCreation = DateTime.Now
+                    CreatedAt = DateTime.UtcNow
 
                 };
                 _dataContext.Games.Add(game);
@@ -65,6 +64,7 @@ namespace WebApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($" GameController - CreateGame - An error occured while someone was creating a game: {ex.ToString()}");
                 return BadRequest(ex.Message);
             }
         }
@@ -100,7 +100,7 @@ namespace WebApi.Controllers
             }
             catch (Exception ex)
             {
-                Log.Error(ex.ToString());
+                Log.Error($" GameController - JoinGame - An error occured while someone was joining a game: {ex.ToString()}");
                 return BadRequest("An error occurred while joining the game.");
             }
         }
