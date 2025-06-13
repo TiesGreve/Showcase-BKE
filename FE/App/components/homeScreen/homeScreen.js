@@ -1,5 +1,6 @@
 import StartScreen from "../startScreen/startScreen.js";
 import ApiHandeler from "../../js/data.js";
+import {verify, setup} from "../../js/2fa.js"
 
 const temp = document.createElement("template");
 temp.innerHTML = `                    
@@ -13,7 +14,14 @@ temp.innerHTML = `
         <input type="password" id="Password" required>
     </div>
     <input class="home-button" type="submit" id="login-submit" value="Login">
-</form>`
+</form>
+<form action="" method="post" style="display: none">
+    <img id="qr"/>
+    <h2>Enter 2FA Code</h2>
+    <input type="text" id="code" placeholder="123456"/>
+    <input class="home-button" type="submit" id="Comfirm" value="Comfirm">
+</form>
+`
 
 const names = ["login", "register"];
 class HomeScreen extends HTMLElement{
@@ -66,6 +74,7 @@ class HomeScreen extends HTMLElement{
         let email = document.getElementById("Email");
         let password = document.getElementById("Password");
         let login = document.getElementById("login-submit");
+        const forms = document.querySelectorAll("form");
         console.log(email + password + login)
         email.addEventListener("change", () => {
             if(email.value != "" && password.value != "")login.removeAttribute("disabled")
@@ -79,10 +88,16 @@ class HomeScreen extends HTMLElement{
             e.preventDefault();
             let result = await ApiHandeler.LoginUser(email.value, password.value);
             if(result){
-                window.location.href = "home.html"
+                forms[0].style.display = "none";
+                forms[1].style.display = "inline";
+                setup();
             }
-
         })
+        forms[1].addEventListener("submit", async (e) => {
+            e.preventDefault();
+            await verify();
+        })
+
 
     }
     ChangePage(location){

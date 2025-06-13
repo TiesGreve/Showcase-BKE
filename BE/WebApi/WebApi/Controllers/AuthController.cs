@@ -62,16 +62,6 @@ namespace WebApi.Controllers
             
         }
         
-        [HttpPost("logout")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        [Authorize]
-        public async Task<IActionResult> Logout()
-        {   
-            await _signInManager.SignOutAsync();
-            return Ok();
-        }
         [HttpGet("Id")]
         [Authorize]
         public async Task<IActionResult> GetId()

@@ -10,6 +10,7 @@
         <meta name="viewport" content="width=device-width,initial-scale=1.0">
         <script type="module" src="./components/startScreen/startScreen.js"></script>
         <script type="module" src="./components/backButton/backButton.js"></script>
+        <script defer type="module" src="./js/2fa.js"></script>
         <script defer type="module" src="./js/register.js"></script>
         <script src="https://www.google.com/recaptcha/api.js?render=6LfKon4pAAAAAMl9e47gJG3eOx7ePgZ_dJTmuOBF"></script>
     </Head>
@@ -49,6 +50,12 @@
                         </div>
                         <p id="Error-Message" class="Error-Message"></p>
                         <input class="home-button" type="submit" id="Submit" disabled = true value="Registreer">
+                    </form>
+                    <form action="" method="post" style="display: none">
+                        <img id="qr"/>
+                        <h2>Enter 2FA Code</h2>
+                        <input type="text" id="code" placeholder="123456"/>
+                        <input class="home-button" type="submit" id="Comfirm" value="Comfirm">
                     </form>
                 </start-screen>
             </div>

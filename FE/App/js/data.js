@@ -36,31 +36,29 @@ export default class ApiHandeler {
 
         }
     }
-    static async RefreshToken(){
+static async RegisterUser(email, username, password, passwordRe){
         try{
-            let response = await fetch(this.connectionString + "/Auth/login", {
+            let response = await fetch(this.connectionString + "/Auth/register", {
                 method: "POST",
                 headers: {
-                    'accept' : 'application/json',
+                    'Accept' : 'application/json',
                     'Content-Type' : 'application/json'
                 },
                 body: JSON.stringify({
                     Email: email,
-                    Password: password
+                    UserName: username,
+                    Password: password,
+                    PasswordCheck: passwordRe
                 })
             })
-            let result = await response.json();
-            if (response.ok){
-                sessionStorage.setItem("token", result)
-            }
-            return response.ok
+            return response;
         }
         catch(e){
-
+    
         }
     }
 
-    static async RegisterUser(email, username, password, passwordRe){
+    static async RefreshToken(){
         try{
             let response = await fetch(this.connectionString + "/Auth/Token", {
                 method: "GET",

@@ -8,6 +8,7 @@ namespace WebApi.Models
     {
         public ICollection<Game> Player1Games {  get; set; }
         public ICollection<Game> Player2Games {  get; set; }
+        public string? TwoFactorSecret { get; set; }
         [Column(TypeName = "timestamp")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [Column(TypeName = "timestamp")]

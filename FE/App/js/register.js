@@ -1,6 +1,7 @@
 import ApiHandeler from "./data.js";
+import {verify, setup} from "./2fa.js"
 
-const form = document.querySelector("form");
+const forms = document.querySelectorAll("form");
 const userName = document.getElementById("UserName");
 const email = document.getElementById("Email");
 const password = document.getElementById("Password");
@@ -100,8 +101,7 @@ function removeError(){
     document.querySelector("#Error-Message").innerText = "";
 }
 
-form.addEventListener("submit", async (event) => {
-    
+forms[0].addEventListener("submit", async (event) => {
     event.preventDefault();
     inputs.forEach(input => {
         if (!input.checkVisibility() && input.innerText != "") {
@@ -115,10 +115,12 @@ form.addEventListener("submit", async (event) => {
     
     if (ApiHandeler.GetCaptchaResult()) {
         setTimeout(async () => {
-            let response = await ApiHandeler.RegisterUser(email.value, userName.value, password.value, passwordRe.value);
-            console.log(response)
+            let response= await ApiHandeler.RegisterUser(email.value, userName.value, password.value, passwordRe.value);
             if(response.status === 200){
-                window.location.href = "home.html";
+                forms[0].style.display = "none";
+                forms[1].style.display = "inline";
+                await ApiHandeler.LoginUser(email.value, password.value)
+                setup()
             }
         }, 1000
         );
@@ -127,6 +129,9 @@ form.addEventListener("submit", async (event) => {
 
 });
 
-async function SendData(){
-
+forms[1].addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await verify();
 }
+)
+

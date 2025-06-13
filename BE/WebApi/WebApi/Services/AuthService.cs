@@ -32,8 +32,7 @@ public class AuthService: IAuthService
         Env.Load();
         var user = await _userManager.FindByEmailAsync(loginModel.Email);
         if (user == null) return new NotFoundObjectResult("Combinatie van Wachtwoord en Email is niet correct");
-
-        var result = await _signInManager.PasswordSignInAsync(user.UserName, loginModel.Password!, true, false);
+        var result = await _signInManager.CheckPasswordSignInAsync(user , loginModel.Password, false);
         if (result.Succeeded)
         {
             var token = await this.GenerateToken(user);
