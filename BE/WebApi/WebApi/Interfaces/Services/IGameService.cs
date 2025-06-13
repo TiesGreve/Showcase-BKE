@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApi.Data;
 using WebApi.Models;
+using WebApi.Models.DTO;
 
 namespace WebApi.Interfaces.Services;
 
@@ -21,5 +22,5 @@ public interface IGameService
     
     public Task<IActionResult> MakeMove(PlayingModel playing);
 
-    public Task<IActionResult> CalculatePlayerStats(Guid guid);
+    public Task<StatsModel> CalculatePlayerStats(Guid guid);
 }

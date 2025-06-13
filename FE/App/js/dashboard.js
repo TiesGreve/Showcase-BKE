@@ -1,5 +1,7 @@
 import ApiHandeler from "./data.js"
 
+ApiHandeler.RefreshToken();
+
 const tempGebruiker = document.createElement("template");
 tempGebruiker.innerHTML = `
     <section class="dashboard-data">
@@ -32,7 +34,6 @@ if(sessionStorage.getItem("token") == null){
 }
 
 var role = await ApiHandeler.GetRole();
-console.log(role)
 if(role.value == "Gebruiker"){
     let screen = document.querySelector("start-screen");
     screen.appendChild(tempGebruiker.content.cloneNode(true))

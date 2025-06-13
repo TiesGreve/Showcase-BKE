@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using WebApi.Data;
 using WebApi.Models;
 using WebApi.Interfaces.Services;
+using Microsoft.AspNetCore.Antiforgery;
 
 namespace WebApi.Controllers
 {
@@ -109,6 +110,14 @@ namespace WebApi.Controllers
             var user = await _userManager.FindByEmailAsync("admin@BKE.com");
             return Ok(user);
         }
-
+        [HttpGet("Token")]
+        [Authorize]
+        public async Task<IActionResult> GetToken()
+        {
+            var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
+            var id = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            return await _authService.RefreshToken(user);
+        }
     }
 }

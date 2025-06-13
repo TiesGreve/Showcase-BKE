@@ -12,6 +12,7 @@ using System.Security.Claims;
 using WebApi.Data;
 using WebApi.Interfaces.Services;
 using WebApi.Models;
+using WebApi.Models.DTO;
 
 namespace WebApi.Controllers
 {
@@ -47,7 +48,7 @@ namespace WebApi.Controllers
                 var id = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
                 var name = _userManager.FindByIdAsync(id);
                 var guid = name.Result.Id;
-
+                Log.Information($"{guid}: voor dit potje");
                 Game game = new Game()
                 {
                     Id = Guid.NewGuid(),
@@ -130,12 +131,12 @@ namespace WebApi.Controllers
         [Authorize]
         [HttpGet("Stats")]
         [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> GetPlayerStats(Guid guid)
+        public async Task<IActionResult> GetPlayerStats()
         {
-            
+            var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
+            var userId = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+            var result = await _gameService.CalculatePlayerStats(Guid.Parse(userId));
+            return Ok(result);
         }
-        
     }
 }

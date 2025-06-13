@@ -4,6 +4,7 @@ using DotNetEnv;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Common;
 using Serilog;
 using WebApi.Data;
 using WebApi.Interfaces.Services;
@@ -35,43 +36,48 @@ public class AuthService: IAuthService
         var result = await _signInManager.PasswordSignInAsync(user.UserName, loginModel.Password!, true, false);
         if (result.Succeeded)
         {
-            Log.Information("Password Correct ");
-
-            var authClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Expiration, DateTime.UtcNow.AddHours(3).ToString("ddd dd MMM yyyy HH:mm:ss")),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Aud, Environment.GetEnvironmentVariable("JWT_AUDIENCE")),
-                new Claim(JwtRegisteredClaimNames.Iss, Environment.GetEnvironmentVariable("JWT_ISSUER"))
-            };
-            Log.Information($"Login user: {user.UserName}");
-            List<Guid> roleIDs;
-            if (_dataContext.UserRoles != null)
-            {
-                roleIDs = _dataContext.UserRoles.Where(r => r.UserId == user.Id).Select(r => r.RoleId).ToList();
-            }
-            else roleIDs = new List<Guid>();
-            if (roleIDs.Count > 0)
-            {
-                var role = await _userManager.GetRolesAsync(user);
-                authClaims.Add(new Claim(ClaimTypes.Role, role[0]));
-            }
-            else
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role, "Gebruiker"));
-            }
-
-            var token = JWThandeler.GetToken(authClaims, _configuration);
-            Console.WriteLine(token.ToString());
+            var token = await this.GenerateToken(user);
             return new OkObjectResult(new JwtSecurityTokenHandler().WriteToken(token));
         }
 
         return new NotFoundObjectResult("Combinatie van Wachtwoord en Email is niet correct");
     }
-    
+    public async Task<IActionResult> RefreshToken(UserModel user)
+    {
+        var token = await this.GenerateToken(user);
+        return new OkObjectResult(new JwtSecurityTokenHandler().WriteToken(token));
+    }
+    public async Task<JwtSecurityToken> GenerateToken(UserModel user)
+    {
+        var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Expiration, DateTime.UtcNow.AddMinutes(30).ToString("ddd dd MMM yyyy HH:mm:ss")),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Aud, Environment.GetEnvironmentVariable("JWT_AUDIENCE")),
+                new Claim(JwtRegisteredClaimNames.Iss, Environment.GetEnvironmentVariable("JWT_ISSUER"))
+            };
+        List<Guid> roleIDs;
+        if (_dataContext.UserRoles != null)
+        {
+            roleIDs = _dataContext.UserRoles.Where(r => r.UserId == user.Id).Select(r => r.RoleId).ToList();
+        }
+        else roleIDs = new List<Guid>();
+        if (roleIDs.Count > 0)
+        {
+            var role = await _userManager.GetRolesAsync(user);
+            authClaims.Add(new Claim(ClaimTypes.Role, role[0]));
+        }
+        else
+        {
+            authClaims.Add(new Claim(ClaimTypes.Role, "Gebruiker"));
+        }
+
+        return JWThandeler.GetToken(authClaims, _configuration);
+    }
+
     public async Task<IActionResult> RegisterUser(RegisterModel registerModel)
     {
         if(registerModel.Password != registerModel.PasswordCheck) return RequestService.ReturnBadRequest(nameof(RegisterUser), "Wachtwoorden komen niet overeen!");

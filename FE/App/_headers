@@ -1,0 +1,5 @@
+/*
+  Content-Security-Policy: script-src 'self'; frame-ancestors 'none';
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Strict-Transport-Security: max-age=86400; includeSubDomains

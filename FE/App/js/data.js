@@ -36,23 +36,44 @@ export default class ApiHandeler {
 
         }
     }
-
-    static async RegisterUser(email, username, password, passwordRe){
+    static async RefreshToken(){
         try{
-            let response = await fetch(this.connectionString + "/Auth/register", {
+            let response = await fetch(this.connectionString + "/Auth/login", {
                 method: "POST",
                 headers: {
-                    'Accept' : 'application/json',
+                    'accept' : 'application/json',
                     'Content-Type' : 'application/json'
                 },
                 body: JSON.stringify({
                     Email: email,
-                    UserName: username,
-                    Password: password,
-                    PasswordCheck: passwordRe
+                    Password: password
                 })
             })
-            return response;
+            let result = await response.json();
+            if (response.ok){
+                sessionStorage.setItem("token", result)
+            }
+            return response.ok
+        }
+        catch(e){
+
+        }
+    }
+
+    static async RegisterUser(email, username, password, passwordRe){
+        try{
+            let response = await fetch(this.connectionString + "/Auth/Token", {
+                method: "GET",
+                headers: {
+                    'Accept' : 'application/json',
+                    'Content-Type' : 'application/json'
+                }})
+            
+            let result = await response.json();
+            if (response.ok){
+                sessionStorage.setItem("token", result)
+            }
+            return response.ok
         }
         catch(e){
     
@@ -127,7 +148,7 @@ export default class ApiHandeler {
                 headers: {
                     'Accept' : 'application/json',
                     'Content-Type' : 'application/json',
-                    'Authorization': 'Bearer ' + token
+                    'Authorization': 'Bearer ' + token,
                 }
             })
             if(response.status === 401) throw new Error(response.status);
@@ -148,7 +169,7 @@ export default class ApiHandeler {
                 headers: {
                     'Accept' : 'application/json',
                     'Content-Type' : 'application/json',
-                    'Authorization': 'Bearer ' + token
+                    'Authorization': 'Bearer ' + token,
                 },
                 body: JSON.stringify({
                     GameId : guid
@@ -177,7 +198,7 @@ export default class ApiHandeler {
                 headers: {
                     'Accept' : 'application/json',
                     'Content-Type' : 'application/json',
-                    'Authorization': 'Bearer ' + token
+                    'Authorization': 'Bearer ' + token,
                 }
             })
             if(response.status === 401) throw new Error(response.status);

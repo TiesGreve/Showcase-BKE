@@ -7,5 +7,6 @@ namespace WebApi.Interfaces.Services
     {
         public Task<IActionResult> LoginUser(LoginModel loginModel);
         public Task<IActionResult> RegisterUser(RegisterModel registerModel);
+        public Task<IActionResult> RefreshToken(UserModel user);
     }
 }
