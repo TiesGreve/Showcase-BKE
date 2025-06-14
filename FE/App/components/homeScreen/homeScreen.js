@@ -1,6 +1,7 @@
 import StartScreen from "../startScreen/startScreen.js";
 import ApiHandeler from "../../js/data.js";
 import {verify, setup} from "../../js/2fa.js"
+import {EmailRegex, PasswordRegex, StringValidation} from "../../js/regex.js"
 
 const temp = document.createElement("template");
 temp.innerHTML = `                    
@@ -75,7 +76,6 @@ class HomeScreen extends HTMLElement{
         let password = document.getElementById("Password");
         let login = document.getElementById("login-submit");
         const forms = document.querySelectorAll("form");
-        console.log(email + password + login)
         email.addEventListener("change", () => {
             if(email.value != "" && password.value != "")login.removeAttribute("disabled")
             //else login.setAttribute("disabled", true);
@@ -86,11 +86,19 @@ class HomeScreen extends HTMLElement{
         })
         login.addEventListener("click", async (e) =>  {
             e.preventDefault();
-            let result = await ApiHandeler.LoginUser(email.value, password.value);
-            if(result){
+            if(!this.validateInput(email.value, password.value)){
+                return;
+            }
+            let result = await ApiHandeler.ValidateUser(email.value, password.value);
+            console.log(result)
+            if(result == "admin"){
+                await ApiHandeler.LoginUser(email.value, password.value)
+                window.location.href = "home.html";
+            }
+            else if(result == "2fa"){
                 forms[0].style.display = "none";
                 forms[1].style.display = "inline";
-                setup();
+                setup(email.value);
             }
         })
         forms[1].addEventListener("submit", async (e) => {
@@ -106,5 +114,14 @@ class HomeScreen extends HTMLElement{
     ChangeLayout(){
         document.createElement("")
     }
-}
+    validateInput(email, pssw){
+        if(!EmailRegex(email) || !StringValidation(email,80)){
+            return false;
+        }
+        if(!PasswordRegex(pssw) || !StringValidation(pssw,128)){
+            return false;
+        }
+        return true;
+    }
+    }
 customElements.define("home-screen", HomeScreen);

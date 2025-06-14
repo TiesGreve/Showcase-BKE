@@ -3,5 +3,6 @@
     public class TwoFactorModel
     {
         public string Code { get; set; }
+        public string Email { get; set; }
     }
 }

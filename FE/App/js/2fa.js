@@ -2,25 +2,29 @@ import ApiHandeler from "./data.js";
 
 export async function verify() {
     const code = document.getElementById('code').value;
-    const token = sessionStorage.getItem('token');
+    const email = document.getElementById("Email").value;
+    const password = document.getElementById("Password");
     fetch(ApiHandeler.connectionString + '/2fa/verify', {
     method: 'POST',
     headers: { 
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
     },
-    body: JSON.stringify({code})
+    body: JSON.stringify({
+        code: code,
+        email: email
     })
-    .then(res => {
+    })
+    .then(async res => {
     if (res.ok) {
+        await ApiHandeler.LoginUser(email, password)
         window.location.href = "home.html";
     } else {
         alert('Invalid 2FA code.');
     }
 });
 }
-export function setup() {
-  fetch(ApiHandeler.connectionString +`/2fa/setup/${email.value}`,{
+export function setup(email) {
+  fetch(ApiHandeler.connectionString +`/2fa/setup/${email}`,{
             method: "GET",
                 headers:  {
                     'Accept' : 'application/json',
@@ -29,8 +33,8 @@ export function setup() {
     .then(res => res.json())
     .then(data => {
         console.log(data)
-      document.getElementById('qr').src = data;
-
+        document.getElementById('qr').src = data;
+        
     });
 }
 

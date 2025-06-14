@@ -1,5 +1,6 @@
 import ApiHandeler from "./data.js";
 import {verify, setup} from "./2fa.js"
+import {EmailRegex, PasswordRegex, StringValidation} from "./regex.js"
 
 const forms = document.querySelectorAll("form");
 const userName = document.getElementById("UserName");
@@ -11,6 +12,7 @@ const inputs = [userName, email, password, passwordRe];
 
 
 inputs.forEach(input => {
+    console.log(input)
     input.addEventListener("input", () => {CheckEvent()})
 })
 
@@ -36,17 +38,7 @@ function CheckInputs(){
     return result;
 }
 
-function PasswordRegex(){
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/.test(password.value);
-}
-function EmailRegex(){
-    return /^(?=.{6,128}$)[\w.-]+@([\w-]+\.)+[\w-]{2,6}$/.test(email.value);
-}
-function StringValidation(stringInput, maxlenght){
-    let isSQLInjection = /(\b(SELECT|INSERT|DELETE|UPDATE|DROP|UNION|OR|AND)\b|--|;|'|"|\/\*|\*\/|xp_)/.test(stringInput);
-    let isScriptInjection = /<\s*script\b|on\w+\s*=|javascript:|data:text\/html|<\s*iframe\b|<\s*img\b[^>]*on\w+\s*=|document\.|window\.|eval\(/.test(stringInput);
-    return !(isSQLInjection || isScriptInjection || stringInput.lenght > maxlenght)
-}
+
 
 function ComparePasswords(){
     return password.value == passwordRe.value;
@@ -60,7 +52,7 @@ function ValidateUsername(){
 }
 
 function ValidateEmail(){
-    if(!EmailRegex()){
+    if(!EmailRegex(email.value)){
         showError(email, "nonvalid email")
         return false;
     }
@@ -72,7 +64,7 @@ function ValidateEmail(){
 }
 
 function ValidatePassword(){
-    if(!PasswordRegex()) {
+    if(!PasswordRegex(password.value)) {
         showError(password, "nonvalid password")
         return false;
     }
@@ -119,8 +111,7 @@ forms[0].addEventListener("submit", async (event) => {
             if(response.status === 200){
                 forms[0].style.display = "none";
                 forms[1].style.display = "inline";
-                await ApiHandeler.LoginUser(email.value, password.value)
-                setup()
+                await setup(email.value)
             }
         }, 1000
         );
@@ -134,4 +125,3 @@ forms[1].addEventListener("submit", async (event) => {
     await verify();
 }
 )
-

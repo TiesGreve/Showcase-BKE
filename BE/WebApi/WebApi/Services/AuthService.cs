@@ -4,6 +4,7 @@ using DotNetEnv;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NuGet.Common;
 using Serilog;
 using WebApi.Data;

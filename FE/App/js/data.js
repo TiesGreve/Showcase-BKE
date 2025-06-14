@@ -36,6 +36,29 @@ export default class ApiHandeler {
 
         }
     }
+    static async ValidateUser(email, password){
+        try{
+            let response = await fetch(this.connectionString + "/Auth/validate", {
+                method: "POST",
+                headers: {
+                    'accept' : 'application/json',
+                    'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({
+                    Email: email,
+                    Password: password
+                })
+            })
+            let result = await response.json();
+            if(response.ok){
+                return result;
+            }
+            return response.ok
+        }
+        catch(e){
+
+        }
+    }
 static async RegisterUser(email, username, password, passwordRe){
         try{
             let response = await fetch(this.connectionString + "/Auth/register", {
@@ -78,7 +101,7 @@ static async RegisterUser(email, username, password, passwordRe){
         }
     }
 
-    static async GetUserId(){
+    static async GetUserId(){D
         try{
             const token = sessionStorage.getItem('token');
             const response = await fetch(this.connectionString + "/Auth/Id", {

@@ -20,17 +20,9 @@ namespace WebApi
                     EmailConfirmed = true
                 };
 
-                IdentityResult result = userManager.CreateAsync(user, Environment.GetEnvironmentVariable("SEED_USER_PASSWORD")).Result;
-
-                if (result.Succeeded)
-                {
-                    userManager.AddToRoleAsync(user, "Admin").Wait();
-                    Log.Information("Seed user Created");
-                }
-                else
-                {
-                    Log.Error($"Seed user Creation failed: {result.Errors}");
-                }
+                userManager.CreateAsync(user, Environment.GetEnvironmentVariable("SEED_USER_PASSWORD")).Wait();
+                userManager.AddToRoleAsync(user, "Admin").Wait();
+                Log.Information("Seed user Created");
                 
             }
         }

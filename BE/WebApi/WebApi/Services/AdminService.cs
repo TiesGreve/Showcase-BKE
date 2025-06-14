@@ -28,15 +28,9 @@ namespace WebApi.Services
         {
             string TokenRole = token.Claims.First(claim => claim.Type == ClaimTypes.Role).Value;
             var userId = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
-            var StoredRole = await _dataContext.UserRoles.Where(ur => ur.UserId.ToString() == userId)
-                        .Join(_dataContext.Roles,
-                              ur => ur.RoleId,
-                              r => r.Id,
-                              (ur, r) => r.Name).FirstOrDefaultAsync();
-            Log.Information($"role1 = {TokenRole}, role2 = {StoredRole}");
-            Log.Information($"role1 = {TokenRole.Trim() == "Admin"}");
-            Log.Information($" role2 = {StoredRole.Trim() == "Admin"}");
-            bool isAdmin = TokenRole.Trim() == "Admin" && StoredRole.Trim() == "Admin";
+            var user = await _userManager.FindByIdAsync(userId);
+            var StoredRole = await _userManager.GetRolesAsync(user);
+            bool isAdmin = TokenRole.Trim() == "Admin" && StoredRole.FirstOrDefault().Trim() == "Admin";
             if (!isAdmin)
             {
                 Log.Warning($"AdminService - ValidateUserIsAdmin - User with id {userId} tried to preform admin actions");

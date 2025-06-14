@@ -61,13 +61,27 @@ namespace WebApi.Controllers
             return await _authService.RegisterUser(registerModel);
             
         }
-        
+        [HttpPost("validate")]
+        public async Task<IActionResult> Validate([FromBody] LoginModel loginModel)
+        {
+            if (ModelState == null) return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var user = await _userManager.FindByEmailAsync(loginModel.Email);
+            if (user == null) return BadRequest("incorrecte inlog gegevens");
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginModel.Password, false);
+            var roles = await _userManager.GetRolesAsync(user);
+            if (!result.Succeeded) return BadRequest("incorrecte inlog gegevens");
+            if (roles.FirstOrDefault() == "Admin") return Ok("admin");
+            return Ok("2fa");
+        }
+
+
         [HttpGet("Id")]
         [Authorize]
         public async Task<IActionResult> GetId()
         {
             var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
-            var id = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier);
+            var id = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
             return Ok(id);
         }
         [HttpGet("Name")]

@@ -34,7 +34,6 @@ namespace WebApi.Controllers
             if (user.TwoFactorSecret == null)
             {
                 var secret = _tfa.CreateSecret();
-                Log.Information($"Secret1: {secret}");
                 user.TwoFactorSecret = secret;
                 user.TwoFactorEnabled = true;
                 await _userManager.UpdateAsync(user);
@@ -47,14 +46,10 @@ namespace WebApi.Controllers
         [HttpPost("verify")]
         public async Task<IActionResult> Verify([FromBody] TwoFactorModel request)
         {
-            var token = await JWThandeler.GetTokenClaims(HttpContext.Request);
-            var id = token.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userManager.FindByIdAsync(id);
-            Log.Information($"Secret2: {user.TwoFactorSecret}");
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user.TwoFactorSecret == null) return Unauthorized();
 
             var isValid = _tfa.VerifyCode(user.TwoFactorSecret, request.Code);
-            Log.Information($"isValid: {isValid}");
             if (!isValid) return Unauthorized();
 
             // Optional: set a flag in DB that 2FA is confirmed
