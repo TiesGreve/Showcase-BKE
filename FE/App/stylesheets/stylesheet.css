@@ -218,3 +218,50 @@ th {
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
+#gdpr-consent {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      z-index: 99999;
+      padding: 20px;
+      text-align: center;
+    }
+
+    #gdpr-consent p {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      max-width: 400px;
+    }
+
+    #gdpr-consent a {
+      color: #4caf50;
+      text-decoration: underline;
+    }
+
+    #gdpr-consent button {
+      background: #4caf50;
+      border: none;
+      color: white;
+      padding: 12px 25px;
+      cursor: pointer;
+      margin: 0 10px;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      min-width: 100px;
+      transition: background-color 0.3s ease;
+    }
+
+    #gdpr-consent button.reject {
+      background: #f44336;
+    }
+
+    #gdpr-consent button:hover {
+      filter: brightness(1.1);
+    }

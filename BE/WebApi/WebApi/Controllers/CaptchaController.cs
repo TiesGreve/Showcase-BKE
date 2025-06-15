@@ -30,7 +30,7 @@ namespace WebApi.Controllers
 
             // IHttpClientFactory
 
-            var result = await client.PostAsync($"https://www.google.com/recaptcha/api/siteverify?secret={_secretKey}&response={captcha.Recaptcha}", content);
+            var result = await client.PostAsync($"https://www.google.com/recaptcha/api/siteverify?secret={Environment.GetEnvironmentVariable("CAPTCHA_SECRET")}&response={captcha.Recaptcha}", content);
             var responseBody = await result.Content.ReadAsStringAsync();
 
             var recaptchaResult = JsonConvert.DeserializeObject<CaptchaResponse>(responseBody);
