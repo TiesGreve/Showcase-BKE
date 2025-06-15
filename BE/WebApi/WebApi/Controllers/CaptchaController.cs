@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DotNetEnv;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Serilog;
 using WebApi.Models;
@@ -9,18 +10,16 @@ namespace WebApi.Controllers
     [Route("api/[controller]")]
     public class CaptchaController : Controller
     {
-        private string _secretKey = "6LfKon4pAAAAAIYT4OTsBa18ZCkvynqGEJ0Qa3et";
-
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> Post([FromBody] CaptchaModel captcha)
         {
-
+            Env.Load();
             var jsonData = new
             {
-                secrect = _secretKey,
+                secrect = Environment.GetEnvironmentVariable("CAPTCHA_SECRET"),
                 response = captcha.Recaptcha
             };
 
